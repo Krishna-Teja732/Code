@@ -21,6 +21,19 @@ class Solution(object):
                 if countOdds[arrayEndInd]-countOdds[arrayEndInd-subarrayLenght]==k: result+=1
         return result
 
+    #350. Intersection of Two Arrays II
+    def intersect(self, nums1, nums2):
+        result = list()
+        for num1 in nums1:
+            for ind in range(0,len(nums2)):
+                if num1==nums2[ind]:
+                    nums2[ind]=-1
+                    result.append(num1)
+                    break
+
+        return result
+
+
 if __name__ == '__main__':
     nums=list(map(int,input()[1:-1].split(',')))
     k = int(input())

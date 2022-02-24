@@ -73,6 +73,43 @@ class Helper{
 
 
 class Solution {
+    // 350. Intersection of Two Arrays II
+    //sol 1
+    public int[] intersect(int[] nums1, int[] nums2) {
+        HashMap<Integer,Integer> map = new HashMap<>();
+        List<Integer> result  = new ArrayList<>();
+        for(int num:nums1){
+            map.put(num,map.getOrDefault(num, 0)+1);
+        }
+        for(int num:nums2){
+            if(map.containsKey(num)){
+                result.add(num);
+                if(map.get(num)==1) map.remove(num);
+                else map.put(num,map.get(num)-1);
+            }
+        }
+        return result.stream().mapToInt(num -> num).toArray();
+    }
+
+    // 350. Intersection of Two Arrays II
+    //sol 2
+    public int[] intersect1(int[] nums1, int[] nums2) {
+        Arrays.sort(nums1);
+        Arrays.sort(nums2);
+        int ind1=0, ind2=0;
+        List<Integer> result  = new ArrayList<>();
+        while(ind1<nums1.length&&ind2<nums2.length){
+            if(nums1[ind1]>nums2[ind2]) ind2++;
+            else if(nums1[ind1]<nums2[ind2]) ind1++;
+            else{
+                result.add(nums1[ind1]);
+                ind1++;
+                ind2++;
+            }
+        }
+        return result.stream().mapToInt(num -> num).toArray();
+    }
+
     //1268. Search Suggestions System
     public List<List<String>> suggestedProducts(String[] products, String searchWord) {
         List<List<String>> results = new ArrayList<>();
