@@ -5,7 +5,8 @@ import java.util.*;
 
 public class leet{
     public static void main(String[] args) throws IOException{
-        System.out.print(new Solution().suggestedProducts(inputUtils.getStringArrayInput(),inputUtils.getStringInput()));
+        int[] arr = new int[]{1,0,0,1,0,1};
+        System.out.print(new Solution().kLengthApart(arr, 2));
     }
 }
 
@@ -69,10 +70,71 @@ class Helper{
         }
         return result;
     }
+
+    //938. Range Sum of BST
+    public int findSum(TreeNode root, int low, int high, int result){
+        if(root==null) return 0;
+        if(root.val<low) result+=findSum(root.right, low, high, result);
+        else if(root.val>high) result+=findSum(root.left, low, high, result);
+        else result+=findSum(root.left, low, high, result)+findSum(root.right, low, high, result);;
+        if(root.val>=low && root.val<=high) result=result+root.val;
+        return result;
+    }
 }
 
 
 class Solution {
+    //1840. Maximum Building Height
+    public int maxBuilding(int n, int[][] restrictions) {
+        if(restrictions.length==0) return n;
+        int[] heights = new int[n];
+        int result = 0, index;
+        for(index=0;index<restrictions.length;index++){
+            if(restrictions[index][0]==2) result = index; 
+            heights[restrictions[index][0]] = restrictions[index][1];
+        }
+        if(restrictions[result][1] == 0) heights[1] = 0;
+        else heights[1] = 1;
+        for(index=2;index<n-1;index++){
+            if(heights[index]!=0) continue;
+            else heights[index] = heights[index-1]+1;
+        }
+        for(index=0;index<n;index++){
+            if(result<heights[index])
+                result = heights[index];
+        }
+        return result;
+    }
+
+    //938. Range Sum of BST
+    public int rangeSumBST(TreeNode root, int low, int high){
+        return new Helper().findSum(root, low, high, 0);
+    }
+    
+    //1437. Check If All 1's Are at Least Length K Places Away
+    public boolean kLengthApart(int[] nums, int k) {
+        int cur=-1, prev=-1, i;
+        k++;
+        for(i=0;i<nums.length;i++){
+            if(prev==-1&&nums[i]==1){
+                prev = i;
+                continue;
+            }if(nums[i]==1){
+                cur = i;
+                break;
+            }
+        }
+        ++i;
+        for(;i<nums.length;i++){
+            if(cur-prev>=k) return false;
+            if(nums[i]==1){
+                prev = cur;
+                cur = i;
+            }
+        }
+        return !(cur-prev>=k);
+    }
+
     // 350. Intersection of Two Arrays II
     //sol 1
     public int[] intersect(int[] nums1, int[] nums2) {
