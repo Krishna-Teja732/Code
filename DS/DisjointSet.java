@@ -1,4 +1,4 @@
-package MazeGenerator;
+package DS;
 
 import java.util.Arrays;
 
@@ -6,17 +6,17 @@ public class DisjointSet {
     private int[] set;
     private int size;
 
-    DisjointSet(int Total_sets){
+    public DisjointSet(int Total_sets){
         set = new int[Total_sets];
         Arrays.fill(set, -1);
         size = Total_sets;
     }
 
-    int size(){
+    public int size(){
         return this.size;
     }
 
-    int findSet(int num){
+    public int findSet(int num){
         if(num<0||num>size){
             throw new ArrayIndexOutOfBoundsException("Range of element "+0+"-"+size);
         }
@@ -27,7 +27,7 @@ public class DisjointSet {
         return num;
     }
 
-    void union(int e1, int e2){
+    public void union(int e1, int e2){
         if((e1<0||e1>size)&&(e2<1||e2>size)){
             throw new ArrayIndexOutOfBoundsException("Range of element "+0+"-"+size);
         }
@@ -40,7 +40,7 @@ public class DisjointSet {
         }
     }
 
-    void print(){
+    public void print(){
         System.out.println(Arrays.toString(set));
     }  
 }
