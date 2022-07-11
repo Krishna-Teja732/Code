@@ -3,11 +3,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class leet{
     public static void main(String[] args) throws IOException{
-        int[] arr = new int[]{1,0,0,1,0,1};
-        System.out.print(new Solution().kLengthApart(arr, 2));
+        String inp = "abc def ghi";
+        System.out.print(new Solution().printVertically(inp));
     }
 }
 
@@ -81,10 +82,62 @@ class Helper{
         if(root.val>=low && root.val<=high) result=result+root.val;
         return result;
     }
+
+    //331. Verify Preorder Serialization of a Binary Tree
+    public int verifyPreorder(int index, String[] preorder, Stack<String> stack){
+        if(index==-1) return -1;
+        if(index>=preorder.length) return index;
+        if(preorder[index].equals("#")) return index+1;
+        if(index+2>preorder.length) return -1;
+        int curIndex = index;
+        stack.push(preorder[index]);
+        index = verifyPreorder(verifyPreorder(index+1, preorder, stack), preorder, stack);
+        if(stack.peek().equals(preorder[curIndex])) stack.pop();
+        else return preorder.length;
+        return index;
+    }
+
+    public List<Integer> initIndex(char[] arr){
+        List<Integer> res = new ArrayList<>();
+        res.add(0);
+        for(int index=1; index<arr.length;index++){
+            if(arr[index-1]==' '){
+                res.add(index);
+            }
+        }
+        return res;
+    }
 }
 
 
 class Solution {
+    //1324. Print Words Vertically
+    public List<String> printVertically(String s) {
+        char[] arr = s.toCharArray();
+        List<Integer> indices = new Helper().initIndex(arr);
+        IntStream.range(0, indices.size()).parallel().forEach(index->{
+            int val = indices.get(index);
+            if(arr[val]!=' ') indices.set(index, val+1);
+        });
+        System.out.println(indices);
+        return new ArrayList<>();
+    }
+    
+    //331. Verify Preorder Serialization of a Binary Tree
+    boolean isValidSerialization(String preorder) {
+        String[] arr = preorder.split(",");
+        if(arr.length==1){
+            if(arr[0].equals("#")) return true;
+            return false;
+        }
+        if(!arr[arr.length-1].equals("#") || !arr[arr.length-2].equals("#")) return false;
+        Stack<String> stack = new Stack<>();
+        int index = new Helper().verifyPreorder(0, arr, stack);
+        if(index<arr.length) return false;
+        if(!stack.isEmpty()) return false;
+        return true;
+    }
+
     //1840. Maximum Building Height
     public int maxBuilding(int n, int[][] restrictions) {
         if(restrictions.length==0) return n;
