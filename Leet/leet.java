@@ -1,116 +1,476 @@
 package Leet;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.IntStream;
 
 public class leet{
     public static void main(String[] args) throws IOException{
-        String inp = "abc def ghi";
-        System.out.print(new Solution().printVertically(inp));
     }
 }
 
-class TreeNode {
-    int val;
-    TreeNode left;
-    TreeNode right;
-    TreeNode(int x) { val = x; }
-    TreeNode(int val, TreeNode left, TreeNode right) {
-        this.val = val;
-        this.left = left;
-        this.right = right;
-    }
-}
-
-class inputUtils{
-    static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-    public static int[] getintArrayInput() throws IOException{
-        String input=reader.readLine();
-        String[] strNums =input.substring(1,input.length()-1).split(","); 
-        int[] nums = new int[strNums.length];
-        for(int ind =0;ind<strNums.length;ind++){
-            nums[ind] = Integer.parseInt(strNums[ind].strip());
-        }
-        return nums;
-    }
-
-    public static String[] getStringArrayInput() throws IOException{
-        String input=reader.readLine();
-        return input.substring(1,input.length()-1).split(",");
-    }
-
-    public static String getStringInput() throws IOException{
-        return reader.readLine();
-    }
-
-    public static int getintInput() throws IOException{
-        return Integer.parseInt(reader.readLine().strip());
-    } 
-}
-
-class Helper{
-    //1268. Search Suggestions System
-    //insert in lexicographic order and list max size is 3
-    public static List<String> insertInList(List<String> result, String val){
-        int ind;
-        if(result.size()<3){
-            for(ind=0;ind<result.size();ind++){
-                if(result.get(ind).compareTo(val)>0){
-                    break;
-                }
+class Solution {
+    public void addNode(TreeNode root,TreeNode node){
+        if(root.val<node.val){
+            if(root.right==null){
+                root.right = node;
             }
-            result.add(ind, val);
-        }else{
-            for(ind=0;ind<3;ind++){
-                if(result.get(ind).compareTo(val)>0){
-                    result.set(ind, val);
-                    break;
+            addNode(root.right, node);
+        }
+        else{
+            if(root.left==null){
+                root.left = node;
+            }
+            addNode(root.left, node);
+        }
+    }
+
+    // 108. Convert Sorted Array to Binary Search Tree
+    public void addNode(TreeNode root, int beg, int end, int[] nums){
+        if(beg==end){
+            addNode(root, new TreeNode(nums[beg]));
+            return;
+        }
+        TreeNode mid = new TreeNode(nums[(int)((beg+end)/2)]);
+        addNode(root, mid);
+        addNode(mid, beg, (int)((beg+end)/2)-1, nums);
+        addNode(root, (int)((beg+end)/2)+1, end, nums);
+    }
+
+    // 108. Convert Sorted Array to Binary Search Tree
+    public TreeNode sortedArrayToBST(int[] nums) {
+        TreeNode root = new TreeNode(nums[(int)((nums.length)/2)]);
+        addNode(root, 0, (int)((nums.length)/2)-1, nums);
+        addNode(root, (int)((nums.length)/2)-1, nums.length-1, nums);
+        return root;
+    }
+
+    // 738. Monotone Increasing Digits
+    public int monotoneIncreasingDigits(int n, int cur) {
+        if(cur>n) return -1; 
+        int res = -1;
+        for(int val = 9;val>=cur%10;val--){
+            res = monotoneIncreasingDigits(n, cur*10 + val);
+            if(res!=-1) break;
+        }
+        return res;
+    }
+
+    // 738. Monotone Increasing Digits
+    public int monotoneIncreasingDigits(int n) {
+        if(n<10) return n;
+        return monotoneIncreasingDigits(n, 1);
+    }
+
+    // 565. Array Nesting
+    public int getNodes(int[] nums, int[] visited, int[] dist, int cur, int step){
+        if(visited[cur]==1) return step;
+        if(dist[cur]!=0) return dist[cur];
+        visited[cur] = 1;
+        int temp = getNodes(nums,visited,dist,nums[cur], step+1);
+        if(temp>dist[cur]) dist[cur] = temp;
+        return dist[cur];
+    }
+
+    // 565. Array Nesting
+    public int arrayNesting(int[] nums) {
+        int res = 0;
+        int[] dist = new int[nums.length];
+        for(int num:nums){
+            int temp = getNodes(nums, new int[nums.length], dist, num, 0);
+            if(temp>res) res = temp;
+        }
+        return res;
+    }
+
+    // 1702. Maximum Binary String After Change
+    public String maximumBinaryString(String binary) {
+        int index = 0;
+        char[] binaryArr = binary.toCharArray();
+        while(index<binaryArr.length) {
+            if(binaryArr[index]=='0') break;
+            index++;
+        }
+        int count0 = 0;
+        for(int curInd = index; curInd<binaryArr.length;curInd++){
+            if(binaryArr[curInd]=='0') count0++;
+            binaryArr[curInd] = '1';
+        }
+        if(index<binaryArr.length) binaryArr[index+count0-1] = '0';
+        return String.valueOf(binaryArr);
+    }
+
+    // 787. Cheapest Flights Within K Stops
+    int finalFlightPrice = -1;
+    public void findCheapestPrice(HashMap<Integer, PriorityQueue<int[]>> adjList, int[] visited, int src, int dst, int k, int curPrice){
+        if(src==dst){
+            if(finalFlightPrice == -1 || finalFlightPrice>curPrice) finalFlightPrice = curPrice;
+            return;
+        }
+        if(curPrice>finalFlightPrice && finalFlightPrice!=-1) return;
+        if(k==0) return;
+        for(int[] flight: adjList.get(src)){
+            if(visited[flight[0]]==1) continue;
+            visited[flight[0]] = 1;
+            findCheapestPrice(adjList, visited, flight[0], dst, k-1, curPrice+flight[1]);
+            visited[flight[0]] = 0;
+        }
+    }
+    
+    // 787. Cheapest Flights Within K Stops
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+        HashMap<Integer, PriorityQueue<int[]>> adjList = new HashMap<>();
+
+        for(int index = 0;index<n;index++){
+            adjList.put(index, new PriorityQueue<>(new Comparator<int[]>() {
+                public int compare(int[] o1, int[] o2){
+                    return o1[1] - o2[1];
                 }
+            }));
+        }
+        
+        for(int[] flight: flights) adjList.get(flight[0]).add(new int[]{flight[1], flight[2]});
+        int[] visited = new int[n];
+        visited[src] = 1;
+        findCheapestPrice(adjList, visited, src, dst, k+1, 0);
+        return finalFlightPrice;
+    }
+
+    // 787. Cheapest Flights Within K Stops - sol1 Time Limit
+    public void findCheapestPrice1(int[][] adjMat, int src, int dst, int k, int curPrice){
+        if(src==dst){
+            if(finalFlightPrice == -1 || finalFlightPrice>curPrice) finalFlightPrice = curPrice;
+            return;
+        }
+        if(curPrice>finalFlightPrice && finalFlightPrice!=-1) return;
+        if(k==0) return;
+        for(int index=0;index<adjMat.length;index++){
+            if(adjMat[src][index]==0) continue;
+            int temp = adjMat[src][index];
+            adjMat[src][index] = 0;
+            findCheapestPrice1(adjMat, index, dst, k-1, curPrice+temp);
+            adjMat[src][index] = temp;
+        }
+    }
+    
+    // 787. Cheapest Flights Within K Stops - sol1 Time Limit
+    public int findCheapestPrice1(int n, int[][] flights, int src, int dst, int k) {
+        int[][] adjMat = new int[n][n];
+        for(int[] flight: flights) adjMat[flight[0]][flight[1]] = flight[2];
+        findCheapestPrice1(adjMat, src, dst, k+1, 0);
+        return finalFlightPrice;
+    }
+
+    // 693. Binary Number with Alternating Bits
+    public boolean hasAlternatingBits(int n) {
+        int power = 1, flag=n&1, val = 2;
+        while(val<=n){
+            int temp = val&n;
+            if(temp>0) temp = 1;
+            if(temp==flag) return false;
+            flag = temp;
+            power++;
+            val = (int)Math.pow(2, power);
+        }
+        return true;
+    }
+
+    // 1462. Course Schedule I sol12
+    public boolean checkPath2(HashMap<Integer, HashSet<Integer>> adjList, int index,int target){
+        List<Integer> q = new ArrayList<>();
+        q.add(index);
+        while(q.size()!=0){
+            int cur = q.remove(0);
+            if(cur == target) return true;
+            q.addAll(adjList.get(cur));
+        }
+        return false;
+    }
+
+    // 1462. Course Schedule I sol2
+    public List<Boolean> checkIfPrerequisite2(int numCourses, int[][] prerequisites, int[][] queries) {
+        HashMap<Integer, HashSet<Integer>> adjList = new HashMap<>();
+        for(int index = 0; index<numCourses; index++) adjList.put(index, new HashSet<>());
+        List<Boolean> res = new ArrayList<>();
+        for(int[] prereq: prerequisites){
+            adjList.get(prereq[1]).add(prereq[0]);
+        }
+        for(int[] query: queries){
+            res.add(checkPath2(adjList, query[1], query[0]));
+        }
+        return res;
+    }
+
+    // 1462. Course Schedule I sol1 
+    public boolean checkPath(GraphNode[] nodes, int index,int target){
+        if(index==target) return true;
+        if(nodes[index]==null) return false;
+        for(int id:nodes[index].child){
+            if(checkPath(nodes, id, target)) return true;
+        }
+        return false;
+    }
+
+    // 1462. Course Schedule I sol1
+    public List<Boolean> checkIfPrerequisite(int numCourses, int[][] prerequisites, int[][] queries) {
+        GraphNode[] nodes = new GraphNode[numCourses];
+        List<Boolean> res = new ArrayList<>();
+        for(int[] prereq: prerequisites){
+            if(nodes[prereq[1]]==null){
+                nodes[prereq[1]] = new GraphNode(prereq[0]);
+            }
+            nodes[prereq[1]].child.add(prereq[0]);
+        }
+        for(int[] query: queries){
+            res.add(checkPath(nodes, query[1], query[0]));
+        }
+        return res;
+    }
+
+    // 2280. Minimum Lines to Represent a Line Chart
+    public int minimumLines(int[][] arr) {
+        if(arr.length == 1) return 0;
+        Arrays.sort(arr, new Comparator<int[]>(){
+            public int compare(int[] o1, int[] o2){
+                return o1[0]-o2[0];
+            }
+        });
+        float slope = ((float)arr[0][1]-arr[1][1])/((float)arr[0][0]-arr[1][0]);
+        float cur = slope;
+        System.out.println(cur);
+        int lines = 1;
+        for(int index = 1;index<arr.length-1;index++){
+            cur = ((float)arr[index][1]-arr[index+1][1])/((float)arr[index][0]-arr[1+index][0]);
+            System.out.println(cur);
+            if(cur!=slope){
+                lines++;
+                slope = cur;
             }
         }
-        return result;
+        if(cur!=slope) lines++;
+        return lines;
     }
 
-    //938. Range Sum of BST
-    public int findSum(TreeNode root, int low, int high, int result){
-        if(root==null) return 0;
-        if(root.val<low) result+=findSum(root.right, low, high, result);
-        else if(root.val>high) result+=findSum(root.left, low, high, result);
-        else result+=findSum(root.left, low, high, result)+findSum(root.right, low, high, result);;
-        if(root.val>=low && root.val<=high) result=result+root.val;
-        return result;
+    // 322. Coin Change
+    public int coinChange(int[] coins, int amount) {
+        Arrays.sort(coins);
+        int beg = -1, end = coins.length;
+        while(++beg<--end){
+            int temp = coins[beg];
+            coins[beg] = coins[end];
+            coins[end] = temp;
+        }
+        return coinChage(coins, amount, 0, 0);
+    }
+    
+    public int coinChage(int[] coins, int amt, int index, int res){
+        if(index==coins.length && amt!=0) return -1;
+        if(amt==0) return res;
+        int curres = -1;
+        for(int cur = index; cur<coins.length; cur++){
+            int rem = amt/coins[index];
+            while(rem>0 && curres==-1){
+                curres = coinChage(coins, amt - rem*coins[index], index + 1, rem+res);
+                rem--;
+            }
+            curres = coinChage(coins, amt, index + 1, res);
+            if(curres!=-1) break;
+        }
+        return curres;
     }
 
-    //331. Verify Preorder Serialization of a Binary Tree
-    public int verifyPreorder(int index, String[] preorder, Stack<String> stack){
-        if(index==-1) return -1;
-        if(index>=preorder.length) return index;
-        if(preorder[index].equals("#")) return index+1;
-        if(index+2>preorder.length) return -1;
-        int curIndex = index;
-        stack.push(preorder[index]);
-        index = verifyPreorder(verifyPreorder(index+1, preorder, stack), preorder, stack);
-        if(stack.peek().equals(preorder[curIndex])) stack.pop();
-        else return preorder.length;
-        return index;
+    // 2090. K Radius Subarray Averages
+    public int[] getRes(int len){
+        int[] res = new int[len];
+        for(int ind=0;ind<len;ind++) res[ind]=-1;
+        return res;
+    }
+    public int[] getAverages(int[] nums, int k) {
+        int[] res = getRes(nums.length);
+        if(k*2>=nums.length) return res;
+        int temp = 2*k+1, ind, size = nums.length-1;
+        double sum = 0;
+        while(temp-->0) sum+=nums[temp];
+        size -= k;
+        for(ind = k; ind<size ;ind++){
+            res[ind] = (int)(sum/(2*k+1));
+            sum += nums[ind+k+1] - nums[ind-k];
+        }
+        res[ind] = (int)(sum/(2*k+1));
+        return res;
     }
 
-    public List<Integer> initIndex(char[] arr){
+    // 1162. As Far from Land as Possible
+    public int maxDistance(int[][] grid) {
+        List<int[]> land = new ArrayList<>(), water = new ArrayList<>();
+        for(int row=0;row<grid.length;row++){
+            for(int col=0;col<grid[0].length;col++){
+                if(grid[row][col]==0) water.add(new int[]{row, col});
+                else water.add(new int[]{row, col});
+            }
+        }
+        int res = grid[water.get(0)[0]][water.get(0)[1]];
+        for(int[] l:land){
+            for(int[] w:water){
+                int dist = new Helper().manhattanDist(l, w);
+                if(grid[w[0]][w[1]]<dist) grid[w[0]][w[1]] = dist;
+            }
+        }
+        for(int[] w:water){
+            if(grid[w[0]][w[1]]>res) res = grid[w[0]][w[1]];
+        }
+        return res;
+    }
+
+    // 480. Sliding Window Median
+    public double[] medianSlidingWindow(int[] nums, int k) {
+        double[] res = new double[nums.length+1-k];
+        int resInd = 0, beg = 0, end = k;
+        ArrayList<Integer> window = new ArrayList<>();
+        for(int index = 0;index<k;index++) window.add(nums[index]);
+        window.sort(new Comparator<Integer>() {
+            public int compare(Integer o1, Integer o2) {
+                return (int)((double)o1-o2);
+            };
+        });
+        while(end<nums.length){
+            System.out.println(window);
+            if(k%2==0) res[resInd++] = window.get(k/2)/2.0+window.get(k/2-1)/2.0;
+            else res[resInd++] = window.get(k/2);
+            window.remove(new Helper().binarySearch(window, nums[beg]));
+            int ind=0;
+            while(ind<window.size()) {
+                if(window.get(ind)>nums[end]) break;
+                ind++;
+            }
+            window.add(ind, nums[end]);
+            beg++;
+            end++;
+        }
+        if(k%2==0) res[resInd++] = window.get(k/2)/2.0+window.get(k/2-1)/2.0;
+        else res[resInd++] = window.get(k/2);
+        return res;
+    }
+
+    //576. Out of Boundary Paths
+    public int findPaths(int m, int n, int maxMove, int startRow, int startColumn) {
+        int res = 0;
+        return new Helper().findPaths(startRow, startColumn, m, n, maxMove, res);
+    }
+
+    //2155. All Divisions With the Highest Score of a Binary Array
+    public List<Integer> maxScoreIndices(int[] nums) {
+        int curScore = 0, size = nums.length+1;
         List<Integer> res = new ArrayList<>();
-        res.add(0);
-        for(int index=1; index<arr.length;index++){
-            if(arr[index-1]==' '){
-                res.add(index);
+        for(int num:nums){
+            if(num==1) curScore+=1;
+        }
+        int max = curScore;
+        for(int index = 1;index<size;index++){
+            if(nums[index-1] == 1) curScore--;
+            if(nums[index-1] == 0) curScore++;
+            if(max<curScore){
+                max = curScore;
+                res.clear();
+            }
+            if(max == curScore) res.add(index);
+        }
+        return res;
+    }
+
+    //222. Count Complete Tree Nodes
+    public int countNodes(TreeNode root) {
+        /* Totlal number of nodes in full binary tree is 2^(n)-1 
+         * where n is the depth of the tree. recursivley check depth of left and
+         * right subtree. If the depth of right tree is less than left tree, 
+         * then left subtree is a full binary tree, next time check using right subtree. 
+         * if both the depths are equal then, right subtree is a full binary tree, 
+         * next iteration check with the left subtree.  
+        */
+        if(root==null) return 0;
+        int d = new Helper().depth(root);
+        return new Helper().countNodes(root.left, root.right, 1, d-1);
+    }
+    
+    // 74. Search a 2D Matrix
+    public boolean searchMatrix(int[][] matrix, int target) {
+        int index = Helper.modSearch(matrix, target);
+        if(matrix[index][0]>target && index!=0) index=index-1;
+        return Helper.binarySearch(matrix[index], target);
+    }
+
+    //566. Reshape the Matrix
+    public int[][] matrixReshape(int[][] mat, int r, int c) {
+        if(r == mat.length && c==mat[0].length) return mat;
+        if(r*c > mat.length*mat[0].length) return mat;
+        int[][] res = new int[r][c];
+        int rcur = 0, ccur = 0;
+        for(int rind=0;rind<mat.length;rind++){
+            for(int cind=0;cind<mat[0].length;cind++){
+                if(ccur==c){
+                    rcur++;
+                    ccur=0;
+                }
+                res[rcur][ccur++] = mat[rind][cind];
             }
         }
         return res;
     }
-}
 
+    //53. Maximum Subarray
+    public int maxSubArray(int[] nums) {
+        int res=nums[0], sum[] = new int[nums.length];
+        sum[0]=nums[0];
+        for(int index = 1; index<nums.length; index++){
+            sum[index] = nums[index]+sum[index-1];
+            if(res>nums[index]) res = nums[index];
+        }
+        if(res<sum[nums.length-1]) res = sum[nums.length-1];
+        for(int start_ind=0;start_ind<nums.length;start_ind++){
+            for(int sub_len = 2; sub_len<nums.length - start_ind;sub_len++){
+                int val = sum[start_ind+sub_len]-sum[start_ind];
+                if(val>res) res = val;
+            }
+        }
+        return res;
+    }
 
-class Solution {
+    //1. Two Sum
+    public int[] twoSumOne(int[] nums, int target) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for(int ind=0;ind<nums.length;ind++){
+            if(map.containsKey(nums[ind])){
+                return new int[]{map.get(nums[ind]),ind};
+            }
+            map.put(target-nums[ind], ind);
+        }
+        return new int[2];
+    }
+
+    //88. Merge Sorted Array
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int resind = m+n-1, ind1 = m-1, ind2=n-1;
+        while(ind1>-1&&ind2>-1){
+            if(nums1[ind1]>nums2[ind2]){
+                nums1[resind] = nums1[ind1];
+                ind1--;
+            }else{
+                nums1[resind] = nums2[ind2];
+                ind2--;
+            }
+            resind--;
+        }
+        while(ind1>-1){
+            nums1[resind]=nums1[ind1];
+            ind1=ind1-1;
+            resind=resind-1;
+        }
+        while(ind2>-1){
+            nums1[resind]=nums2[ind2];
+            resind=resind-1;
+            ind2 = ind2-1;
+        }
+    }
+
     //1324. Print Words Vertically
     public List<String> printVertically(String s) {
         char[] arr = s.toCharArray();
@@ -395,6 +755,45 @@ class Solution {
     }    
 }
 
+class GraphNode{
+    int id;
+    HashSet<Integer> child;
+
+    GraphNode(int val){
+        id = val;
+        child = new HashSet<>();
+    }
+}
+
+class AuthenticationManager {
+
+    HashMap<String, Integer> tokens;
+    int expTime;
+    
+    public AuthenticationManager(int timeToLive) {
+        expTime = timeToLive;
+        tokens = new HashMap<>();        
+    }
+    
+    public void generate(String tokenId, int currentTime) {
+        tokens.put(tokenId, currentTime);
+    }
+    
+    public void renew(String tokenId, int currentTime) {
+        if(!tokens.containsKey(tokenId)) return;
+        if(currentTime-tokens.get(tokenId)<expTime){
+            tokens.put(tokenId, currentTime);
+        }
+    }
+    
+    public int countUnexpiredTokens(int currentTime) {
+        int res= 0;
+        for(int vals: tokens.values()){
+            if(currentTime-vals<expTime) res++;
+        }
+        return res;
+    }
+}
 
 //1146. Snapshot Array unsolved
 class SnapshotArray {
@@ -419,5 +818,34 @@ class SnapshotArray {
     
     public int get(int index, int snap_id) {
         return map.get(Integer.valueOf(snap_id))[index];
+    }
+}
+
+class MyQueue {
+    private Stack<Integer> stk;
+    private Stack<Integer> temp;
+    
+    public MyQueue() {
+        stk = new Stack<>();
+        temp = new Stack<>();
+    }
+    
+    public void push(int x) {
+        stk.push(x);
+    }
+    
+    public int pop() {
+        while(!stk.isEmpty()) temp.push(stk.pop());
+        int val = temp.pop();
+        while(!temp.isEmpty()) stk.push(temp.pop());
+        return val;
+    }
+    
+    public int peek() {
+        return stk.peek();
+    }
+    
+    public boolean empty() {
+        return stk.isEmpty();
     }
 }
