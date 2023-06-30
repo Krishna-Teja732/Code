@@ -9,6 +9,62 @@ public class leet{
 }
 
 class Solution {
+    //1743. Restore the Array From Adjacent Pairs
+    public int[] restoreArray(int[][] adjacentPairs) {
+        int[] result = new int[adjacentPairs.length+1];
+
+        // Construct adjacency list as a Map
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        for(int[] pair: adjacentPairs){
+            Helper.restoreArrayHelper(pair[0], pair[1], map);
+            Helper.restoreArrayHelper(pair[1], pair[0], map);
+        }
+
+        // Get corner element i.e. element with one neighbour
+        for(int key: map.keySet()){
+            if (map.get(key).size() == 1){
+                result[0] = key;
+                break;
+            }
+        }
+
+        // Construct original array
+        for (int index = 1; index < result.length; index++){
+            int prev = result[index-1];
+            List<Integer> neighbours = map.remove(prev);
+            if (neighbours.size() == 1){
+                result[index] = neighbours.get(0);
+                continue;
+            }
+            for (int neighbour: neighbours) {
+                if (map.containsKey(neighbour)){
+                    result[index] = neighbour;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    // 2191. Sort the Jumbled Numbers
+    public int[] sortJumbled(int[] mapping, int[] nums) {
+        int[][] arr = new int[nums.length][2];
+        for(int index=0;index<nums.length;index++){
+            arr[index][0] = nums[index];
+            arr[index][1] = Helper.getVal(mapping, nums[index]);;
+        }
+        Arrays.sort(arr, new Comparator<int[]>(){
+            public int compare(int[] o1, int[] o2){
+                return o1[1]-o2[1];
+            }
+        });
+        for(int index=0;index<nums.length;index++){
+            nums[index] = arr[index][0];
+        }
+        return nums;    
+    }
+
+
     public void addNode(TreeNode root,TreeNode node){
         if(root.val<node.val){
             if(root.right==null){

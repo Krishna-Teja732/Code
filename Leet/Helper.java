@@ -3,6 +3,25 @@ package Leet;
 import java.util.*;
 
 public class Helper {
+    // 1743. Restore the Array From Adjacent Pairs. Add entry adjacency list(in this case it is a HashMap)
+    public static void restoreArrayHelper(int key, int value, HashMap<Integer, List<Integer>> map){
+        List<Integer> values = map.getOrDefault(key, new ArrayList<>());
+        values.add(value);
+        map.put(key, values);
+    }
+
+    // 2191. Sort the Jumbled Numbers
+    public static int getVal(int[] mappings, int val){
+        int res = 0, power = 0;
+        do{
+            res = res+(int)Math.pow(10, power)*mappings[val%10];
+            power++;
+            val = (int)(val/10);
+        }while(val>0);
+        return res;
+    }
+    
+
     //1268. Search Suggestions System
     //insert in lexicographic order and list max size is 3
     public static List<String> insertInList(List<String> result, String val){

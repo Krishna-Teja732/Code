@@ -16,9 +16,9 @@ class Solution(object):
             else:
                 countOdds.append(countOdds[-1])
         if countOdds[-1]<k: return 0
-        for subarrayLenght in range(k,size):
-            for arrayEndInd in range(subarrayLenght,size):
-                if countOdds[arrayEndInd]-countOdds[arrayEndInd-subarrayLenght]==k: result+=1
+        for subarrayLength in range(k,size):
+            for arrayEndInd in range(subarrayLength,size):
+                if countOdds[arrayEndInd]-countOdds[arrayEndInd-subarrayLength]==k: result+=1
         return result
 
     #350. Intersection of Two Arrays II
