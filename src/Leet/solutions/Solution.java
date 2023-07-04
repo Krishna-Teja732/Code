@@ -1,16 +1,13 @@
-package Leet;
-import java.io.IOException;
+package Leet.solutions;
+import Leet.DataStructures.GraphNode;
+import Leet.DataStructures.TreeNode;
+import Leet.utils.Helper;
+
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class leet{
-    public static void main(String[] args) throws IOException{
-        int result = new Solution().integerBreak(43);
-        System.out.printf("Value of n: %d, product: %d\n", 43, result);
-    }
-}
+public class Solution {
 
-class Solution {
     // 343. Integer Break, function returns the product when the number n is split k times with each split of size splitSize
     double getProduct(int n, int splitSize, int k){
         return Math.pow(splitSize, k-1)*(n-(splitSize*(k-1)));
@@ -76,13 +73,9 @@ class Solution {
         int[][] arr = new int[nums.length][2];
         for(int index=0;index<nums.length;index++){
             arr[index][0] = nums[index];
-            arr[index][1] = Helper.getVal(mapping, nums[index]);;
+            arr[index][1] = Helper.getVal(mapping, nums[index]);
         }
-        Arrays.sort(arr, new Comparator<int[]>(){
-            public int compare(int[] o1, int[] o2){
-                return o1[1]-o2[1];
-            }
-        });
+        Arrays.sort(arr, Comparator.comparingInt(o -> o[1]));
         for(int index=0;index<nums.length;index++){
             nums[index] = arr[index][0];
         }
@@ -90,7 +83,7 @@ class Solution {
     }
 
 
-    public void addNode(TreeNode root,TreeNode node){
+    public void addNode(TreeNode root, TreeNode node){
         if(root.val<node.val){
             if(root.right==null){
                 root.right = node;
@@ -111,17 +104,17 @@ class Solution {
             addNode(root, new TreeNode(nums[beg]));
             return;
         }
-        TreeNode mid = new TreeNode(nums[(int)((beg+end)/2)]);
+        TreeNode mid = new TreeNode(nums[(beg+end)/2]);
         addNode(root, mid);
-        addNode(mid, beg, (int)((beg+end)/2)-1, nums);
-        addNode(root, (int)((beg+end)/2)+1, end, nums);
+        addNode(mid, beg, ((beg+end)/2) -1, nums);
+        addNode(root, ((beg+end)/2) +1, end, nums);
     }
 
     // 108. Convert Sorted Array to Binary Search Tree
     public TreeNode sortedArrayToBST(int[] nums) {
-        TreeNode root = new TreeNode(nums[(int)((nums.length)/2)]);
-        addNode(root, 0, (int)((nums.length)/2)-1, nums);
-        addNode(root, (int)((nums.length)/2)-1, nums.length-1, nums);
+        TreeNode root = new TreeNode(nums[(nums.length)/2]);
+        addNode(root, 0, ((nums.length)/2) -1, nums);
+        addNode(root, ((nums.length)/2) -1, nums.length-1, nums);
         return root;
     }
 
@@ -202,11 +195,7 @@ class Solution {
         HashMap<Integer, PriorityQueue<int[]>> adjList = new HashMap<>();
 
         for(int index = 0;index<n;index++){
-            adjList.put(index, new PriorityQueue<>(new Comparator<int[]>() {
-                public int compare(int[] o1, int[] o2){
-                    return o1[1] - o2[1];
-                }
-            }));
+            adjList.put(index, new PriorityQueue<>(Comparator.comparingInt(o -> o[1])));
         }
         
         for(int[] flight: flights) adjList.get(flight[0]).add(new int[]{flight[1], flight[2]});
@@ -282,7 +271,7 @@ class Solution {
     }
 
     // 1462. Course Schedule I sol1 
-    public boolean checkPath(GraphNode[] nodes, int index,int target){
+    public boolean checkPath(GraphNode[] nodes, int index, int target){
         if(index==target) return true;
         if(nodes[index]==null) return false;
         for(int id:nodes[index].child){
@@ -310,11 +299,7 @@ class Solution {
     // 2280. Minimum Lines to Represent a Line Chart
     public int minimumLines(int[][] arr) {
         if(arr.length == 1) return 0;
-        Arrays.sort(arr, new Comparator<int[]>(){
-            public int compare(int[] o1, int[] o2){
-                return o1[0]-o2[0];
-            }
-        });
+        Arrays.sort(arr, Comparator.comparingInt(o -> o[0]));
         float slope = ((float)arr[0][1]-arr[1][1])/((float)arr[0][0]-arr[1][0]);
         float cur = slope;
         System.out.println(cur);
@@ -362,7 +347,7 @@ class Solution {
     // 2090. K Radius Subarray Averages
     public int[] getRes(int len){
         int[] res = new int[len];
-        for(int ind=0;ind<len;ind++) res[ind]=-1;
+        Arrays.fill(res, -1);
         return res;
     }
     public int[] getAverages(int[] nums, int k) {
@@ -408,16 +393,13 @@ class Solution {
         int resInd = 0, beg = 0, end = k;
         ArrayList<Integer> window = new ArrayList<>();
         for(int index = 0;index<k;index++) window.add(nums[index]);
-        window.sort(new Comparator<Integer>() {
-            public int compare(Integer o1, Integer o2) {
-                return (int)((double)o1-o2);
-            };
-        });
+        window.sort((o1, o2) -> (int)((double)o1-o2));
         while(end<nums.length){
             System.out.println(window);
             if(k%2==0) res[resInd++] = window.get(k/2)/2.0+window.get(k/2-1)/2.0;
             else res[resInd++] = window.get(k/2);
-            window.remove(new Helper().binarySearch(window, nums[beg]));
+            new Helper();
+            window.remove(Helper.binarySearch(window, nums[beg]));
             int ind=0;
             while(ind<window.size()) {
                 if(window.get(ind)>nums[end]) break;
@@ -485,13 +467,13 @@ class Solution {
         if(r*c > mat.length*mat[0].length) return mat;
         int[][] res = new int[r][c];
         int rcur = 0, ccur = 0;
-        for(int rind=0;rind<mat.length;rind++){
-            for(int cind=0;cind<mat[0].length;cind++){
-                if(ccur==c){
+        for (int[] ints : mat) {
+            for (int cind = 0; cind < mat[0].length; cind++) {
+                if (ccur == c) {
                     rcur++;
-                    ccur=0;
+                    ccur = 0;
                 }
-                res[rcur][ccur++] = mat[rind][cind];
+                res[rcur][ccur++] = ints[cind];
             }
         }
         return res;
@@ -499,7 +481,8 @@ class Solution {
 
     //53. Maximum Subarray
     public int maxSubArray(int[] nums) {
-        int res=nums[0], sum[] = new int[nums.length];
+        int res=nums[0];
+        int[] sum = new int[nums.length];
         sum[0]=nums[0];
         for(int index = 1; index<nums.length; index++){
             sum[index] = nums[index]+sum[index-1];
@@ -568,15 +551,13 @@ class Solution {
     boolean isValidSerialization(String preorder) {
         String[] arr = preorder.split(",");
         if(arr.length==1){
-            if(arr[0].equals("#")) return true;
-            return false;
+            return arr[0].equals("#");
         }
         if(!arr[arr.length-1].equals("#") || !arr[arr.length-2].equals("#")) return false;
         Stack<String> stack = new Stack<>();
         int index = new Helper().verifyPreorder(0, arr, stack);
         if(index<arr.length) return false;
-        if(!stack.isEmpty()) return false;
-        return true;
+        return stack.isEmpty();
     }
 
     //1840. Maximum Building Height
@@ -591,8 +572,10 @@ class Solution {
         if(restrictions[result][1] == 0) heights[1] = 0;
         else heights[1] = 1;
         for(index=2;index<n-1;index++){
-            if(heights[index]!=0) continue;
-            else heights[index] = heights[index-1]+1;
+            if(heights[index]==0){
+                heights[index] = heights[index-1]+1;
+            }
+
         }
         for(index=0;index<n;index++){
             if(result<heights[index])
@@ -690,7 +673,7 @@ class Solution {
     public int finalValueAfterOperations(String[] operations) {
         int x = 0;
         for(String operation:operations){
-            char s = operation.charAt(0),e = operation.charAt(operation.length());
+            char s = operation.charAt(0),e = operation.charAt(operation.length()-1);
             if(s=='+') ++x;
             else if(s == '-') --x;
             else if(e == '+') x++;
@@ -703,7 +686,7 @@ class Solution {
     public int[] minOperations(String boxes) {
         char[] array = boxes.toCharArray();
         int l=0, r=0, size = array.length;
-        int ans[] = new int[size];
+        int[] ans = new int[size];
         for(int ind=0;ind<size;ind++){
             if(array[ind]=='1'){
                 ans[0] = ans[0]+ind;
@@ -755,7 +738,7 @@ class Solution {
         while(sum!=target){
             if(sum>target){
                 ind1--;
-            }else if(sum<target){
+            }else {
                 ind2++;
             }
             sum = numbers[ind1]+numbers[ind2];
@@ -766,13 +749,13 @@ class Solution {
     public double average(int[] salary) {
         int min=salary[0],max=salary[0],size = salary.length,cur;
         double sum =0;
-        for(int ind=0;ind<size;ind++){
-            cur = salary[ind];
-            sum+=cur;
-            if(cur>max){
-                max=cur;
-            }else if(cur<min){
-                min=cur;
+        for (int i : salary) {
+            cur = i;
+            sum += cur;
+            if (cur > max) {
+                max = cur;
+            } else if (cur < min) {
+                min = cur;
             }
         }
         return (sum-max-min)/(size-2);
@@ -817,7 +800,8 @@ class Solution {
     }
     
     public int numOfSubarrays(int[] arr) {
-        int sum[] = new int[arr.length], res=0;
+        int[] sum = new int[arr.length];
+        int res=0;
         sum[0] = arr[0];
         if(arr[0]%2!=0) res++;
         for(int i=1;i<arr.length;i++){
@@ -829,104 +813,9 @@ class Solution {
             if(sum[len-1]%2!=0) res++;
             for(int beg=len+1;beg<arr.length;beg++){
                 if(sum[beg]-sum[beg-len]%2!=0)
-                res++;
+                   res++;
             }
         }
         return res;
     }    
-}
-
-class GraphNode{
-    int id;
-    HashSet<Integer> child;
-
-    GraphNode(int val){
-        id = val;
-        child = new HashSet<>();
-    }
-}
-
-class AuthenticationManager {
-
-    HashMap<String, Integer> tokens;
-    int expTime;
-    
-    public AuthenticationManager(int timeToLive) {
-        expTime = timeToLive;
-        tokens = new HashMap<>();        
-    }
-    
-    public void generate(String tokenId, int currentTime) {
-        tokens.put(tokenId, currentTime);
-    }
-    
-    public void renew(String tokenId, int currentTime) {
-        if(!tokens.containsKey(tokenId)) return;
-        if(currentTime-tokens.get(tokenId)<expTime){
-            tokens.put(tokenId, currentTime);
-        }
-    }
-    
-    public int countUnexpiredTokens(int currentTime) {
-        int res= 0;
-        for(int vals: tokens.values()){
-            if(currentTime-vals<expTime) res++;
-        }
-        return res;
-    }
-}
-
-//1146. Snapshot Array unsolved
-class SnapshotArray {
-
-    private Integer[] array;
-    private HashMap<Integer,Integer[]> map;
-    private Integer snapid;
-    public SnapshotArray(int length) {
-        array = new Integer[length];
-        map = new HashMap<>();
-        snapid = 0; 
-    }
-    
-    public void set(int index, int val) {
-        array[index] = val;
-    }
-    
-    public int snap() {
-        map.put(snapid, Arrays.copyOf(array,array.length));
-        return snapid++;
-    }
-    
-    public int get(int index, int snap_id) {
-        return map.get(Integer.valueOf(snap_id))[index];
-    }
-}
-
-class MyQueue {
-    private Stack<Integer> stk;
-    private Stack<Integer> temp;
-    
-    public MyQueue() {
-        stk = new Stack<>();
-        temp = new Stack<>();
-    }
-    
-    public void push(int x) {
-        stk.push(x);
-    }
-    
-    public int pop() {
-        while(!stk.isEmpty()) temp.push(stk.pop());
-        int val = temp.pop();
-        while(!temp.isEmpty()) stk.push(temp.pop());
-        return val;
-    }
-    
-    public int peek() {
-        return stk.peek();
-    }
-    
-    public boolean empty() {
-        return stk.isEmpty();
-    }
 }

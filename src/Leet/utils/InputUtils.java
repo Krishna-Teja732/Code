@@ -1,9 +1,9 @@
-package Leet;
+package Leet.utils;
 
 import java.io.*;
 
-class inputUtils{
-    static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+public class InputUtils {
+    public static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     public static int[] getintArrayInput() throws IOException{
         String input=reader.readLine();
         String[] strNums =input.substring(1,input.length()-1).split(","); 

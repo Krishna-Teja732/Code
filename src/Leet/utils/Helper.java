@@ -1,4 +1,6 @@
-package Leet;
+package Leet.utils;
+
+import Leet.DataStructures.TreeNode;
 
 import java.util.*;
 
@@ -16,7 +18,7 @@ public class Helper {
         do{
             res = res+(int)Math.pow(10, power)*mappings[val%10];
             power++;
-            val = (int)(val/10);
+            val = val/10;
         }while(val>0);
         return res;
     }
@@ -49,7 +51,7 @@ public class Helper {
         if(root==null) return 0;
         if(root.val<low) result+=findSum(root.right, low, high, result);
         else if(root.val>high) result+=findSum(root.left, low, high, result);
-        else result+=findSum(root.left, low, high, result)+findSum(root.right, low, high, result);;
+        else result+=findSum(root.left, low, high, result)+findSum(root.right, low, high, result);
         if(root.val>=low && root.val<=high) result=result+root.val;
         return result;
     }
@@ -79,7 +81,7 @@ public class Helper {
         return res;
     }
 
-    static boolean binarySearch(int[] arr, int target){
+    public static boolean binarySearch(int[] arr, int target){
         int mid = (arr.length-1)/2, beg = 0, end = arr.length-1;
         while(beg<end){
             if(arr[mid] == target) return true;
@@ -87,11 +89,10 @@ public class Helper {
             else beg = mid+1;
             mid = (beg+end)/2;
         }
-        if(arr[mid] == target) return true;
-        return false;
+        return arr[mid] == target;
     }
 
-    public int binarySearch(ArrayList<Integer> arr, int target){
+    public static int binarySearch(ArrayList<Integer> arr, int target){
         int mid = (arr.size()-1)/2, beg = 0, end = arr.size()-1;
         while(beg<end){
             if(arr.get(mid) == target) return mid;
@@ -104,7 +105,7 @@ public class Helper {
     }
 
     // 74. Search a 2D Matrix
-    static int modSearch(int[][] arr, int target){
+    public static int modSearch(int[][] arr, int target){
         int mid = (arr.length-1)/2, beg = 0, end = arr.length-1;
         while(beg<end){
             if(arr[mid][0] == target) return mid;
@@ -155,7 +156,7 @@ public class Helper {
     public int manhattanDist(int[] coord1, int[] coord2){
         int res = 0;
         for(int index=0;index<coord1.length;index++){
-            res+=(int)Math.abs(coord1[index]-coord2[index]);
+            res+= Math.abs(coord1[index]-coord2[index]);
         }
         return res;
     }
