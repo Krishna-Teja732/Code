@@ -1,12 +1,60 @@
 package Leet.solutions;
 import Leet.DataStructures.GraphNode;
 import Leet.DataStructures.TreeNode;
+import Leet.DataStructures.Node;
 import Leet.utils.Helper;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
 public class Solution {
+    // 116. Populating Next Right Pointers in Each Node
+    public Node connect(Node root) {
+        if (root != null) {
+            connect(root.left, root.right);
+        }
+        return root;
+    }
+
+    // 116. Populating Next Right Pointers in Each Node
+    public void connect(Node left, Node right) {
+        if (left == null || right == null){
+            return;
+        }
+        left.right = right;
+        connect(left.left, left.right);
+        connect(right.left, right.right);
+        connect(left.right, right.left);
+    }
+
+
+    // 120. Triangle
+    public int minimumTotal(List<List<Integer>> triangle) {
+        return minimumTotal(triangle, 1, triangle.get(0), triangle.get(0).get(0));
+    }
+
+    // 120. Triangle
+    // This function gets the input triangle and computes the sum of the current row and returns the minimum of the current row
+    public int minimumTotal(List<List<Integer>> triangle, int currentRowIndex, List<Integer> sumOfValues, int minimum) {
+        if (currentRowIndex == triangle.size()){
+            return minimum;
+        }
+        List<Integer> nextSumOfValues = new ArrayList<>();
+        nextSumOfValues.add(triangle.get(currentRowIndex).get(0)+sumOfValues.get(0));
+        int minimumForCurrentRow = nextSumOfValues.get(0);
+        for(int index = 1; index < currentRowIndex; index++){
+            int curSum = Math.min(
+                            triangle.get(currentRowIndex).get(index)+sumOfValues.get(index-1),
+                            triangle.get(currentRowIndex).get(index)+sumOfValues.get(index));
+            minimumForCurrentRow = Math.min(curSum, minimumForCurrentRow);
+            nextSumOfValues.add(curSum);
+        }
+        if (currentRowIndex!=0){
+            nextSumOfValues.add(triangle.get(currentRowIndex).get(currentRowIndex)+sumOfValues.get(currentRowIndex-1));
+            minimumForCurrentRow = Math.min(nextSumOfValues.get(nextSumOfValues.size()-1), minimumForCurrentRow);
+        }
+        return minimumTotal(triangle, currentRowIndex+1, nextSumOfValues, minimumForCurrentRow);
+    }
 
     // 343. Integer Break, function returns the product when the number n is split k times with each split of size splitSize
     double getProduct(int n, int splitSize, int k){

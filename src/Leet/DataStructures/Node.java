@@ -6,6 +6,10 @@ public class Node {
     public Node next;
     public Node child;
 
+    public Node right;
+
+    public Node left;
+
     public Node(int val){
         this.val = val;
     }
