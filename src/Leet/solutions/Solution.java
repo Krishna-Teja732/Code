@@ -8,6 +8,63 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class Solution {
+    // 49. Group Anagrams
+    public List<List<String>> groupAnagrams(String[] strs) {
+        HashMap<int[], List<String>> map = new HashMap<>();
+
+        for (String str: strs){
+            int[] key = groupAnagrams(str);
+            List<String> val = map.getOrDefault(key, new ArrayList<>());
+            val.add(str);
+            map.put(key, val);
+        }
+
+        return new ArrayList<>(map.values());
+    }
+
+    public int[] groupAnagrams(String str){
+        int[] map = new int[26];
+
+        for(char ch: str.toCharArray()){
+            map[ch-'a']++;
+        }
+
+        return map;
+    }
+
+    // 187. Repeated DNA Sequences
+    public List<String> findRepeatedDnaSequences(String s) {
+        List<String> result = new ArrayList<>();
+        if (s.length()<10) {
+            return result;
+        }
+        HashMap<String, Integer> map = new HashMap<>();
+        for (int index = 0; index < s.length()-10; index++){
+            String key = s.substring(index, index+10);
+            map.put(key, map.getOrDefault(key, 0)+1);
+            if (map.get(key) == 2) {
+                result.add(key);
+            }
+        }
+        return result;
+    }
+
+    // 129. Sum Root to Leaf Numbers
+    public int sumNumbers(TreeNode root) {
+        return sumNumbers(root, 0);
+    }
+
+    public int sumNumbers(TreeNode root, int curNum){
+        if (root == null) {
+            return 0;
+        }
+        curNum = curNum*10+root.val;
+        if (root.left == null && root.right == null) {
+            return curNum;
+        }
+        return sumNumbers(root.left, curNum) + sumNumbers(root.right, curNum);
+    }
+
     // 116. Populating Next Right Pointers in Each Node
     public Node connect(Node root) {
         if (root != null) {
