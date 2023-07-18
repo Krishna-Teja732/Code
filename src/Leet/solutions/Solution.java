@@ -8,12 +8,20 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class Solution {
+
+    // 1344. Angle Between Hands of a Clock
+    public double angleClock(int hour, int minutes) {
+        double result = Math.abs(minutes*6 - (hour*30 + 0.5*minutes));
+        return (result > 180)? (360 - result): result;
+    }
+
+
     // 49. Group Anagrams
     public List<List<String>> groupAnagrams(String[] strs) {
-        HashMap<int[], List<String>> map = new HashMap<>();
+        HashMap<String, List<String>> map = new HashMap<>();
 
         for (String str: strs){
-            int[] key = groupAnagrams(str);
+            String key = groupAnagrams(str);
             List<String> val = map.getOrDefault(key, new ArrayList<>());
             val.add(str);
             map.put(key, val);
@@ -22,14 +30,16 @@ public class Solution {
         return new ArrayList<>(map.values());
     }
 
-    public int[] groupAnagrams(String str){
-        int[] map = new int[26];
+    public String groupAnagrams(String str){
+        StringBuilder builder = new StringBuilder();
+        builder.append("00000000000000000000000000");
 
         for(char ch: str.toCharArray()){
-            map[ch-'a']++;
+            int index = ch-'a';
+            builder.setCharAt(index, (char)(builder.charAt(index)+1));
         }
 
-        return map;
+        return builder.toString();
     }
 
     // 187. Repeated DNA Sequences
