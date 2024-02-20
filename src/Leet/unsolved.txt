@@ -2,7 +2,6 @@
 1026
 1840
 1324
-53
 576
 1162
 322
@@ -11,3 +10,13 @@
 787 - time limit
 565 - time limit
 1711 -time limit
+274 - improve using binary search
+
+53
+- Wrong answer.
+- Problem: The min sum index should be less than the max sum index. This is not checked in the solution.
+
+1976
+- Time limit exceeded
+- Current approach: depth first graph traversal and prune paths that have cost higher than min cost
+- Improve approach by storing a list of prev nodes for each destination node such that the cost of from 0 to destination node is minimum via the prevNodes

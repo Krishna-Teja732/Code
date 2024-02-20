@@ -1,13 +1,225 @@
-package Leet.solutions;
+package Leet.Solutions;
 import Leet.DataStructures.GraphNode;
+import Leet.DataStructures.ListNode;
 import Leet.DataStructures.TreeNode;
 import Leet.DataStructures.Node;
+import Leet.Main;
 import Leet.utils.Helper;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
 public class Solution {
+
+    // 988 Smallest String starting from leaf
+    public String smallestFromLeaf(TreeNode root) {
+        List<String> result = new ArrayList<>();
+        smallestFromLeaf(root, result, new StringBuilder());
+        return result.getFirst();
+    }
+
+    private void getSmallerString(String currentString, List<String> result) {
+        if (result.isEmpty()) {
+            result.add(currentString);
+            return;
+        }
+
+        if (currentString.compareTo(result.getFirst()) < 0) {
+            result.set(0, currentString);
+        }
+    }
+
+    // 988 Smallest String starting from leaf
+    public boolean smallestFromLeaf(TreeNode root, List<String> result, StringBuilder currentString) {
+        if (root == null) {
+            return true;
+        }
+
+        if (!result.isEmpty()) {
+            if (result.getFirst().length() < currentString.length()) {
+                return false;
+            }
+        }
+
+        currentString.insert(0, (char)(root.val+'a'));
+        boolean noLeftSubTree = smallestFromLeaf(root.left, result, currentString);
+        boolean noRightSubTree = smallestFromLeaf(root.right, result, currentString);
+        if ( noLeftSubTree && noRightSubTree) {
+            getSmallerString(currentString.toString(), result);
+        }
+        currentString.deleteCharAt(0);
+
+        return false;
+    }
+
+    // 662 Max Width of binary tree
+    public int widthOfBinaryTree(TreeNode root) {
+        HashMap<Integer, int[]> widthMap = new HashMap<>();
+        widthOfBinaryTree(root, 0, 0, widthMap);
+        int result = 0;
+
+        for (int[] width : widthMap.values()) {
+            result = Math.max(result, width[1]-width[0]+1);
+        }
+        return result;
+    }
+
+    // 662 Max Width of binary tree, helper
+    private void widthOfBinaryTree(TreeNode root, int height , int index, HashMap<Integer, int[]> widthMap) {
+        if (root == null) {
+            return;
+        }
+
+        int[] width = widthMap.getOrDefault(height, new int[]{index, index});
+
+        width[0] = Math.min(width[0], index);
+        width[1] = Math.max(width[1], index);
+
+        widthMap.put(index, width);
+
+        widthOfBinaryTree(root.left, height+1, index*2+1, widthMap);
+        widthOfBinaryTree(root.right, height+1, index*2+2, widthMap);
+    }
+
+    // 160
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        HashSet<ListNode> set = new HashSet<>();
+
+        while (headB != null) {
+            set.add(headB);
+            headB = headB.next;
+        }
+
+        while (headA != null) {
+            if (set.contains(headA))  {
+                break;
+            }
+            headA = headA.next;
+        }
+
+        return headA;
+    }
+
+    // 890 Helper
+    public boolean checkPattern(char[] word, char[] pattern){
+        if (word.length!=pattern.length) {
+            return false;
+        }
+        int[] map = new int[27];
+        int[] mappedAlphabets = new int[27];
+        for (int index = 0; index<pattern.length; index++) {
+            int key = pattern[index]-96;
+            if (map[key] == 0 && mappedAlphabets[word[index]-96] == 0) {
+                map[key] = word[index]-96;
+                mappedAlphabets[word[index]-96] = 1;
+            }
+            else if (map[key] == 0 && mappedAlphabets[word[index]-96] != 0){
+                return false;
+            }
+            else if (map[key] != (word[index]-96)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // 890
+    public List<String> findAndReplacePattern(String[] words, String pattern) {
+        List<String> result = new ArrayList<>();
+        char[] patternChar = pattern.toCharArray();
+        for (String word: words) {
+            if (checkPattern(word.toCharArray(), patternChar)) {
+                result.add(word);
+            }
+        }
+        return result;
+    }
+
+    // 1451.
+    public String arrangeWords(String text) {
+        String[] words = text.split(" ");
+        words[0] = words[0].toLowerCase();
+        Arrays.sort(words, Comparator.comparingInt(String::length));
+        StringBuilder resultBuilder = new StringBuilder();
+        for (String word: words) {
+            resultBuilder
+                    .append(word)
+                    .append(" ");
+        }
+        resultBuilder.setCharAt(0, (char) (resultBuilder.charAt(0)-32));
+        resultBuilder.deleteCharAt(resultBuilder.length()-1);
+        return resultBuilder.toString();
+    }
+
+    // 274 helper
+    public boolean countCitations(int[] citations, int hIndex) {
+        int count = 0;
+        for (int citation: citations) {
+            if (citation >= hIndex) {
+                count++;
+            }
+            if (count >= hIndex) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 274
+    public int hIndex(int[] citations) {
+        int hIndex;
+        for (hIndex=citations.length; hIndex>-1; hIndex--) {
+            if (countCitations(citations, hIndex)) {
+                break;
+            }
+        }
+        return hIndex;
+    }
+
+    // 150 helper
+    public int evalRPN(Stack<Integer> operands, String operator){
+        int operand2 = operands.pop();
+        int operand1 = operands.pop();
+        return switch (operator) {
+            case "+" -> operand1 + operand2;
+            case "-" -> operand1 - operand2;
+            case "*" -> operand1 * operand2;
+            default -> operand1 / operand2;
+        };
+    }
+
+    // 150
+    public int evalRPN(String[] tokens) {
+        Stack<Integer> operands = new Stack<>();
+        HashSet<String> operators = new HashSet<>(Arrays.asList("+", "-", "*", "/", ""));
+        for (String token: tokens) {
+            if (!operators.contains(token)) {
+                operands.push(Integer.parseInt(token));
+                continue;
+            }
+            operands.push(evalRPN(operands, token));
+        }
+        return operands.pop();
+    }
+
+    // 1282
+    public List<List<Integer>> groupThePeople(int[] groupSizes) {
+        HashMap<Integer, List<Integer>> count = new HashMap<>();
+        List<List<Integer>> result = new ArrayList<>();
+        for (int index = 0; index < groupSizes.length; index++) {
+            List<Integer> values = count.getOrDefault(groupSizes[index], new ArrayList<>());
+            values.add(index);
+            if (values.size() == groupSizes[index]) {
+                result.add(values);
+                count.put(groupSizes[index], new ArrayList<>());
+            }
+            else {
+                count.put(groupSizes[index], values);
+            }
+        }
+        return result;
+    }
 
     // 1344. Angle Between Hands of a Clock
     public double angleClock(int hour, int minutes) {
@@ -596,21 +808,20 @@ public class Solution {
 
     //53. Maximum Subarray
     public int maxSubArray(int[] nums) {
-        int res=nums[0];
-        int[] sum = new int[nums.length];
-        sum[0]=nums[0];
-        for(int index = 1; index<nums.length; index++){
-            sum[index] = nums[index]+sum[index-1];
-            if(res>nums[index]) res = nums[index];
+        int res = Integer.MIN_VALUE;
+        int[] sum = new int[nums.length+1];
+        for(int index = 1; index<sum.length; index++){
+            sum[index] = nums[index-1] + sum[index-1];
+            res = Math.max(res, nums[index-1]);
         }
-        if(res<sum[nums.length-1]) res = sum[nums.length-1];
-        for(int start_ind=0;start_ind<nums.length;start_ind++){
-            for(int sub_len = 2; sub_len<nums.length - start_ind;sub_len++){
-                int val = sum[start_ind+sub_len]-sum[start_ind];
-                if(val>res) res = val;
-            }
+
+        int maxSum = Integer.MIN_VALUE;
+        int minSum = Integer.MAX_VALUE;
+        for (int index = 0; index<sum.length; index++) {
+            maxSum = Math.max(maxSum, sum[index]);
+            minSum = Math.min(minSum, sum[index]);
         }
-        return res;
+        return Math.max(res, maxSum-minSum);
     }
 
     //1. Two Sum

@@ -1,4 +1,4 @@
-package Leet.solutions;
+package Leet.Solutions;
 
 import java.util.Arrays;
 import java.util.HashMap;
