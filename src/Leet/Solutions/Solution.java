@@ -11,8 +11,29 @@ import java.util.stream.IntStream;
 public class Solution {
 
     /**
+     * Add a person and the set of the person to the secret keepers
+     * */
+    private void addToSecretKeepers(int person,
+                                    HashMap<Integer, HashSet<Integer>> setToMembers,
+                                    HashMap<Integer, Integer> memberToSet,
+                                    HashSet<Integer> secretKeepers
+    ) {
+        int setId = memberToSet.getOrDefault(person, -1);
+
+        if (setId == -1) {
+            secretKeepers.add(person);
+            return;
+        }
+
+        HashSet<Integer> members = setToMembers.remove(setId);
+        if (members!=null) {
+            secretKeepers.addAll(members);
+        }
+    }
+
+    /**
      * Question: 2029 Find all people with secret, helper
-     * This function performs the set union
+     * This function performs the set union for people who does not know the secret
      * **/
     private int addMeetingToSet(int person1, int person2, HashMap<Integer, HashSet<Integer>> setToMembers, HashMap<Integer, Integer> memberToSet, int setId) {
         if (!memberToSet.containsKey(person1) && !memberToSet.containsKey(person2)) {
@@ -51,7 +72,7 @@ public class Solution {
             HashSet<Integer> set2Members = setToMembers.get(person2Set);
             set2Members.add(person1);
 
-            memberToSet.put(person2, person2Set);
+            memberToSet.put(person1, person2Set);
         }
 
         return setId;
@@ -63,23 +84,16 @@ public class Solution {
          * Sort the meetings based on time
          * Create a set for each person,
          * The first person and 0th person will be in same set (knows secret)
-         * For a time step t, get all the meetings are perform set union
-         * This will combine all the persons that have attended a meeting with each other
-         * For each of these sets, if someone knows the secret, then evey one in the set will know the secret -> add all of them to the result
-         * The result will be in the final secret set
+         * if someone knows the secret, then evey one in the set will know the secret -> add all of them to the result
          */
         PriorityQueue<int[]> potentialMeetings = new PriorityQueue<>(Comparator.comparingInt(meeting -> meeting[2]));
         potentialMeetings.addAll(Arrays.asList(meetings));
-        HashSet<Integer> result = new HashSet<>(Arrays.asList(0, firstPerson));
-
-        HashMap<Integer, HashSet<Integer>> setToMembers = new HashMap<>();
-        HashMap<Integer, Integer> memberToSet = new HashMap<>();
-        int setId;
+        HashSet<Integer> secretKeepers = new HashSet<>(Arrays.asList(0, firstPerson));
 
         while (!potentialMeetings.isEmpty()) {
-            setId = 0;
-            setToMembers.clear();
-            memberToSet.clear();
+            HashMap<Integer, HashSet<Integer>> setToMembers = new HashMap<>();
+            HashMap<Integer, Integer> memberToSet = new HashMap<>();
+            int setId = 0;
 
             int timeStep = potentialMeetings.peek()[2];
             while (!potentialMeetings.isEmpty()) {
@@ -87,30 +101,18 @@ public class Solution {
                     break;
                 }
                 int[] meeting = potentialMeetings.poll();
-                setId = addMeetingToSet(meeting[0], meeting[1], setToMembers, memberToSet, setId);
-            }
 
-            for (HashSet<Integer> setMembers: setToMembers.values()) {
-                for(int member: setMembers) {
-                    if (result.contains(member)) {
-                        result.addAll(setMembers);
-                        break;
-                    }
+                if (!secretKeepers.contains(meeting[0]) && !secretKeepers.contains(meeting[1])) {
+                    setId = addMeetingToSet(meeting[0], meeting[1], setToMembers, memberToSet, setId);
                 }
-            }
-
-        }
-
-        for (HashSet<Integer> setMembers: setToMembers.values()) {
-            for(int member: setMembers) {
-                if (result.contains(member)) {
-                    result.addAll(setMembers);
-                    break;
+                else {
+                    addToSecretKeepers(meeting[0], setToMembers, memberToSet, secretKeepers);
+                    addToSecretKeepers(meeting[1], setToMembers, memberToSet, secretKeepers);
                 }
             }
         }
 
-        return result.stream().toList();
+        return secretKeepers.stream().toList();
     }
 
     // 119 Pascal Triangle II
