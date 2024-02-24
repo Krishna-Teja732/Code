@@ -20,3 +20,7 @@
 - Time limit exceeded
 - Current approach: depth first graph traversal and prune paths that have cost higher than min cost
 - Improve approach by storing a list of prev nodes for each destination node such that the cost of from 0 to destination node is minimum via the prevNodes
+
+2029
+- Time limit exceeded
+- Current Approach: Explained in comments

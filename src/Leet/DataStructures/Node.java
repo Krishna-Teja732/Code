@@ -1,6 +1,7 @@
 package Leet.DataStructures;
 
 public class Node {
+    public int key;
     public int val;
     public Node prev;
     public Node next;
@@ -10,13 +11,8 @@ public class Node {
 
     public Node left;
 
-    public Node(int val){
+    public Node(int key, int val) {
+        this.key = key;
         this.val = val;
-    }
-
-    public Node(int val, Node next, Node prev, Node child){
-        this.val = val;
-        this.next = next;
-        this.child = child;
     }
 }

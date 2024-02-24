@@ -3,13 +3,133 @@ import Leet.DataStructures.GraphNode;
 import Leet.DataStructures.ListNode;
 import Leet.DataStructures.TreeNode;
 import Leet.DataStructures.Node;
-import Leet.Main;
 import Leet.utils.Helper;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
 public class Solution {
+
+    /**
+     * Question: 2029 Find all people with secret, helper
+     * This function performs the set union
+     * **/
+    private int addMeetingToSet(int person1, int person2, HashMap<Integer, HashSet<Integer>> setToMembers, HashMap<Integer, Integer> memberToSet, int setId) {
+        if (!memberToSet.containsKey(person1) && !memberToSet.containsKey(person2)) {
+            setToMembers.put(setId, new HashSet<>(Arrays.asList(person1, person2)));
+            memberToSet.put(person1, setId);
+            memberToSet.put(person2, setId);
+            setId++;
+        }
+        else if (memberToSet.containsKey(person1) && memberToSet.containsKey(person2)) {
+            int set1 = memberToSet.get(person1);
+            int set2 = memberToSet.get(person2);
+            if (set1 == set2) {
+                return setId;
+            }
+
+            // Update setToMembers
+            HashSet<Integer> set2Members = setToMembers.remove(set2);
+            HashSet<Integer> set1members = setToMembers.remove(set1);
+            set1members.addAll(set2Members);
+            setToMembers.put(set1, set1members);
+
+            // Update memberToSet
+            for (int member: set2Members) {
+                memberToSet.put(member, set1);
+            }
+        }
+        else if (memberToSet.containsKey(person1)) {
+            int person1Set = memberToSet.get(person1);
+            HashSet<Integer> set1Members = setToMembers.get(person1Set);
+            set1Members.add(person2);
+
+            memberToSet.put(person2, person1Set);
+        }
+        else {
+            int person2Set = memberToSet.get(person2);
+            HashSet<Integer> set2Members = setToMembers.get(person2Set);
+            set2Members.add(person1);
+
+            memberToSet.put(person2, person2Set);
+        }
+
+        return setId;
+    }
+
+    // 2029 Find all people with secret, Main function
+    public List<Integer> findAllPeople(int n, int[][] meetings, int firstPerson) {
+        /*
+         * Sort the meetings based on time
+         * Create a set for each person,
+         * The first person and 0th person will be in same set (knows secret)
+         * For a time step t, get all the meetings are perform set union
+         * This will combine all the persons that have attended a meeting with each other
+         * For each of these sets, if someone knows the secret, then evey one in the set will know the secret -> add all of them to the result
+         * The result will be in the final secret set
+         */
+        PriorityQueue<int[]> potentialMeetings = new PriorityQueue<>(Comparator.comparingInt(meeting -> meeting[2]));
+        potentialMeetings.addAll(Arrays.asList(meetings));
+        HashSet<Integer> result = new HashSet<>(Arrays.asList(0, firstPerson));
+
+        HashMap<Integer, HashSet<Integer>> setToMembers = new HashMap<>();
+        HashMap<Integer, Integer> memberToSet = new HashMap<>();
+        int setId;
+
+        while (!potentialMeetings.isEmpty()) {
+            setId = 0;
+            setToMembers.clear();
+            memberToSet.clear();
+
+            int timeStep = potentialMeetings.peek()[2];
+            while (!potentialMeetings.isEmpty()) {
+                if (potentialMeetings.peek()[2] != timeStep) {
+                    break;
+                }
+                int[] meeting = potentialMeetings.poll();
+                setId = addMeetingToSet(meeting[0], meeting[1], setToMembers, memberToSet, setId);
+            }
+
+            for (HashSet<Integer> setMembers: setToMembers.values()) {
+                for(int member: setMembers) {
+                    if (result.contains(member)) {
+                        result.addAll(setMembers);
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        for (HashSet<Integer> setMembers: setToMembers.values()) {
+            for(int member: setMembers) {
+                if (result.contains(member)) {
+                    result.addAll(setMembers);
+                    break;
+                }
+            }
+        }
+
+        return result.stream().toList();
+    }
+
+    // 119 Pascal Triangle II
+    public List<Integer> getRow(int rowIndex) {
+        // Use Binomial theorem. Instead of calculating the factorial
+        // for all the numbers in the rage row index,
+        // multiply the previous result with the difference
+        List<Integer> result = new ArrayList<>();
+        result.add(1);
+
+        long coeff = 1;
+
+        for (int r = 1; r <= rowIndex; r++) {
+            coeff = coeff * (rowIndex - r + 1) / r;
+            result.add((int)coeff);
+        }
+
+        return result;
+    }
 
     // 988 Smallest String starting from leaf
     public String smallestFromLeaf(TreeNode root) {
@@ -18,6 +138,7 @@ public class Solution {
         return result.getFirst();
     }
 
+    // 988 Smallest String starting from leaf helper
     private void getSmallerString(String currentString, List<String> result) {
         if (result.isEmpty()) {
             result.add(currentString);
@@ -29,7 +150,7 @@ public class Solution {
         }
     }
 
-    // 988 Smallest String starting from leaf
+    // 988 Smallest String starting from leaf helper
     public boolean smallestFromLeaf(TreeNode root, List<String> result, StringBuilder currentString) {
         if (root == null) {
             return true;
