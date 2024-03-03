@@ -10,7 +10,68 @@ import java.util.stream.IntStream;
 
 public class Solution {
 
+    // 2295. Replace Elements in an array
+    public int[] arrayChange(int[] nums, int[][] operations) {
+        HashMap<Integer, Integer> reverseIndex = new HashMap<>();
+
+        for (int index = 0; index< nums.length; index++) {
+            reverseIndex.put(nums[index], index);
+        }
+
+        for (int[] operation: operations) {
+            int index = reverseIndex.remove(operation[0]);
+            nums[index] = operation[1];
+            reverseIndex.put(operation[1], index);
+        }
+
+        return nums;
+    }
+
+    // 841. Keys and Rooms, helper
+    private int visitRoom(int roomNumber, List<List<Integer>> rooms, int[] visited, int roomsVisited) {
+        visited[roomNumber] = 1;
+        roomsVisited++;
+        for (int roomKey: rooms.get(roomNumber)) {
+            if (visited[roomKey] == 1) {
+                continue;
+            }
+            roomsVisited = visitRoom(roomKey, rooms, visited, roomsVisited);
+        }
+        return roomsVisited;
+    }
+
+    // 841. Keys and Rooms
+    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
+        return visitRoom(0, rooms, new int[rooms.size()], 0) == rooms.size();
+    }
+
+    // 107. Binary Tree Level Order Traversal, helper
+    private void levelOrderBottom(TreeNode root, int depth, List<List<Integer>> result) {
+        if (root == null) {
+            return;
+        }
+
+        if (result.size() == depth) {
+            result.add(new ArrayList<>());
+        }
+
+        result.get(depth).add(root.val);
+
+        levelOrderBottom(root.left, depth+1, result);
+        levelOrderBottom(root.right, depth+1, result);
+    }
+
+    // 107. Binary Tree Level Order Traversal
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+
+        levelOrderBottom(root, 0, result);
+
+        return result.reversed();
+    }
+
     /**
+     * Question: 2092 Find all people with secret, helper
      * Add a person and the set of the person to the secret keepers
      * */
     private void addToSecretKeepers(int person,
@@ -32,7 +93,7 @@ public class Solution {
     }
 
     /**
-     * Question: 2029 Find all people with secret, helper
+     * Question: 2092 Find all people with secret, helper
      * This function performs the set union for people who does not know the secret
      * **/
     private int addMeetingToSet(int person1, int person2, HashMap<Integer, HashSet<Integer>> setToMembers, HashMap<Integer, Integer> memberToSet, int setId) {
@@ -78,7 +139,7 @@ public class Solution {
         return setId;
     }
 
-    // 2029 Find all people with secret, Main function
+    // 2092 Find all people with secret, Main function
     public List<Integer> findAllPeople(int n, int[][] meetings, int firstPerson) {
         /*
          * Sort the meetings based on time
