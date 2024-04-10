@@ -1,4 +1,4 @@
-package Search;
+package Algorithms.Search;
 
 import java.util.*;
 

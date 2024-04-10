@@ -10,6 +10,197 @@ import java.util.stream.IntStream;
 
 public class Solution {
 
+    // 67 Add Binary
+    public String addBinary(String a, String b) {
+
+        // str a will always be longer than str b
+        if (b.length() > a.length()) {
+            String temp = b;
+            b = a;
+            a = temp;
+        }
+
+        StringBuilder result = new StringBuilder();
+        int carry = 0;
+        int indexA = a.length()-1, indexB = b.length()-1;
+
+        while(indexA > -1 && indexB > -1) {
+            int sum = a.charAt(indexA) + b.charAt(indexB) - 96 + carry;
+            carry  = sum / 2;
+            sum = sum % 2;
+            result.append(sum);
+
+            indexA--;
+            indexB--;
+        }
+
+        while(indexA > -1) {
+            int sum = a.charAt(indexA) - 48 + carry;
+            carry  = sum / 2;
+            sum = sum % 2;
+            result.append(sum);
+
+            indexA--;
+        }
+
+        if (carry == 1) {
+            result.append(carry);
+        }
+
+        return result.reverse().toString();
+    }
+
+    // 459. Repeated SubString pattern
+    public boolean repeatedSubstringPattern(String s) {
+
+        // Step 1: Find subString length such that you can split length into equal parts by length,
+        // Step 2: Check if all equal length subStrings are same
+        // Example: if string length is 9, the possible subString lengths are {3, 1}
+        // Example 2: if string length is 16, the possible subString lengths are {8, 4, 2, 1}
+        for (int numberOfStrings = 2; numberOfStrings <= s.length(); numberOfStrings++) {
+            if (s.length()%numberOfStrings!=0) {
+                continue;
+            }
+
+            int subStringLength = s.length()/numberOfStrings;
+            String subString = s.substring(0, subStringLength);
+            boolean misMatch = false;
+
+            for (int index = subStringLength; index < s.length(); index += subStringLength) {
+                if (!subString.equals(s.substring(index, index+subStringLength))) {
+                    misMatch = true;
+                    break;
+                }
+            }
+
+            if (!misMatch) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // 1572. Matrix Diagonal Sum
+    public int diagonalSum(int[][] mat) {
+        int sum = 0;
+
+        for (int x = 0; x < mat.length; x++) {
+            sum += mat[x][x];
+            sum += mat[x][mat.length-x-1];
+        }
+
+        return mat.length%2==0? sum - mat[mat.length/2][mat.length/2] : sum;
+    }
+
+    // 28. Find the index of the first occurrence of a string
+    public int strStr(String haystack, String needle) {
+        char[] haystackChars = haystack.toCharArray();
+        char[] needleChars = needle.toCharArray();
+
+        int startInd = 0;
+
+        for (; startInd <= haystackChars.length - needleChars.length; startInd++) {
+            int needledInd = 0;
+
+            for (; needledInd < needle.length(); needledInd++) {
+                if (haystackChars[startInd+needledInd] != needleChars[needledInd]) {
+                    break;
+                }
+            }
+
+            if (needledInd == needleChars.length) {
+                return startInd;
+            }
+        }
+
+        return -1;
+    }
+
+    // 657. Robot return origin
+    public boolean judgeCircle(String moves) {
+        int xCoordinate = 0;
+        int yCoordinate = 0;
+
+        for (char ch: moves.toCharArray()) {
+            switch (ch) {
+                case 'L' -> xCoordinate++;
+                case 'R' -> xCoordinate--;
+                case 'U' -> yCoordinate++;
+                case 'D' -> yCoordinate--;
+            }
+        }
+
+        return xCoordinate == 0 && yCoordinate == 0;
+    }
+
+    // 682. Baseball Game
+    public int calPoints(String[] operations) {
+        int[] scores = new int[operations.length];
+        int scoreIndex = 0;
+
+        for (String operation: operations) {
+            switch (operation) {
+                case "C" -> scoreIndex = scoreIndex - 2;
+                case "D" -> scores[scoreIndex] = scores[scoreIndex - 1] * 2;
+                case "+" -> scores[scoreIndex] = scores[scoreIndex - 1] + scores[scoreIndex - 2];
+                default -> scores[scoreIndex] = Integer.parseInt(operation);
+            }
+            scoreIndex++;
+        }
+
+        int finalScore = 0;
+
+        while (scoreIndex > 0) {
+            finalScore = finalScore + scores[--scoreIndex];
+        }
+
+        return finalScore;
+    }
+
+    // 66. Plus one
+    public int[] plusOne(int[] digits) {
+        int carry = 1;
+
+        for (int index = digits.length-1; index > -1; index--) {
+            int sum = digits[index] + carry;
+            digits[index] = sum%10;
+            carry = sum/10;
+        }
+
+        if (carry == 0) {
+            return digits;
+        }
+
+        int[] result = new int[digits.length+1];
+        System.arraycopy(digits, 0, result, 1, digits.length);
+        result[0] = carry;
+
+        return result;
+    }
+
+    // 1750. Minimum Length of strings after deleting similar ends
+    public int minimumLength(String s) {
+        char[] arr = s.toCharArray();
+        int start = 0, end = arr.length-1;
+        while (start < end) {
+            if (arr[start] != arr[end]) {
+                break;
+            }
+            int p1 = start, p2 = end;
+            while (arr[p1] == arr[start] && p1 < end) {
+                p1++;
+            }
+            start = p1;
+            while (arr[p2] == arr[end] && p2 >= start) {
+                p2--;
+            }
+            end = p2;
+        }
+
+        return start > end ? 0:end-start+1;
+    }
+
     // 2295. Replace Elements in an array
     public int[] arrayChange(int[] nums, int[][] operations) {
         HashMap<Integer, Integer> reverseIndex = new HashMap<>();
@@ -94,7 +285,7 @@ public class Solution {
 
     /**
      * Question: 2092 Find all people with secret, helper
-     * This function performs the set union for people who does not know the secret
+     * This function performs the set union for people who do not know the secret
      * **/
     private int addMeetingToSet(int person1, int person2, HashMap<Integer, HashSet<Integer>> setToMembers, HashMap<Integer, Integer> memberToSet, int setId) {
         if (!memberToSet.containsKey(person1) && !memberToSet.containsKey(person2)) {
@@ -609,7 +800,7 @@ public class Solution {
         }
     }
 
-    // 108. Convert Sorted Array to Binary Search Tree
+    // 108. Convert Sorted Array to Binary Algorithms.Search Tree
     public void addNode(TreeNode root, int beg, int end, int[] nums){
         if(beg==end){
             addNode(root, new TreeNode(nums[beg]));
@@ -621,7 +812,7 @@ public class Solution {
         addNode(root, ((beg+end)/2) +1, end, nums);
     }
 
-    // 108. Convert Sorted Array to Binary Search Tree
+    // 108. Convert Sorted Array to Binary Algorithms.Search Tree
     public TreeNode sortedArrayToBST(int[] nums) {
         TreeNode root = new TreeNode(nums[(nums.length)/2]);
         addNode(root, 0, ((nums.length)/2) -1, nums);
@@ -881,8 +1072,7 @@ public class Solution {
         List<int[]> land = new ArrayList<>(), water = new ArrayList<>();
         for(int row=0;row<grid.length;row++){
             for(int col=0;col<grid[0].length;col++){
-                if(grid[row][col]==0) water.add(new int[]{row, col});
-                else water.add(new int[]{row, col});
+                water.add(new int[]{row, col});
             }
         }
         int res = grid[water.get(0)[0]][water.get(0)[1]];
@@ -965,7 +1155,7 @@ public class Solution {
         return new Helper().countNodes(root.left, root.right, 1, d-1);
     }
     
-    // 74. Search a 2D Matrix
+    // 74. Algorithms.Search a 2D Matrix
     public boolean searchMatrix(int[][] matrix, int target) {
         int index = Helper.modSearch(matrix, target);
         if(matrix[index][0]>target && index!=0) index=index-1;
@@ -1160,7 +1350,7 @@ public class Solution {
         return result.stream().mapToInt(num -> num).toArray();
     }
 
-    //1268. Search Suggestions System
+    //1268. Algorithms.Search Suggestions System
     public List<List<String>> suggestedProducts(String[] products, String searchWord) {
         List<List<String>> results = new ArrayList<>();
         char[] flags = new char[products.length];

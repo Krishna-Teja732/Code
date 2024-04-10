@@ -1,4 +1,4 @@
-package Search;
+package Algorithms.Search;
 
 public class BinarySearch {
     static boolean search(int[] arr, int target){

@@ -24,7 +24,7 @@ public class Helper {
     }
     
 
-    //1268. Search Suggestions System
+    //1268. Algorithms.Search Suggestions System
     //insert in lexicographic order and list max size is 3
     public static List<String> insertInList(List<String> result, String val){
         int ind;
@@ -104,7 +104,7 @@ public class Helper {
         return mid;
     }
 
-    // 74. Search a 2D Matrix
+    // 74. Algorithms.Search a 2D Matrix
     public static int modSearch(int[][] arr, int target){
         int mid = (arr.length-1)/2, beg = 0, end = arr.length-1;
         while(beg<end){
