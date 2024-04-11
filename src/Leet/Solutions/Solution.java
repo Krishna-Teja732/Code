@@ -10,6 +10,174 @@ import java.util.stream.IntStream;
 
 public class Solution {
 
+    // 1502. Can make arithmetic progression from sequence
+    public boolean canMakeArithmeticProgression(int[] arr) {
+        int min = arr[0];
+        int max = arr[0];
+
+        for (int elem: arr) {
+            if (elem < min) {
+                min = elem;
+            }
+            else if (max < elem) {
+                max = elem;
+            }
+        }
+
+        if ((max - min)%(arr.length-1)!=0) {
+            return false;
+        }
+
+        int diff = (max - min)/(arr.length-1);
+        if (diff == 0) {
+            return true;
+        }
+
+
+        int[] visited = new int[arr.length];
+        for (int elem: arr) {
+            if ((elem - min) % diff !=0) {
+                return false;
+            }
+
+            int index = (elem - min) / diff;
+            if (visited[index] == 1) {
+                    return false;
+            }
+            visited[index] = 1;
+        }
+
+        return true;
+    }
+
+
+    // 54. Spiral matrix
+    public List<Integer> spiralOrder(int[][] matrix) {
+        ArrayList<Integer> result = new ArrayList<>();
+
+        // direction to move
+        int[][] directions = new int[][]{ {0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        int curDirInd = 0;
+
+        // index
+        int min_x = -1, max_x = matrix.length;
+        int min_y = -1, max_y = matrix[0].length;
+        int x = 0, y = 0;
+
+        while (result.size() != matrix.length*matrix[0].length) {
+
+            result.add(matrix[x][y]);
+
+            x = x + directions[curDirInd][0];
+            y = y + directions[curDirInd][1];
+
+            if (x == max_x) {
+                max_y--;
+                x--;
+                y--;
+                curDirInd = (curDirInd+1)%4;
+            }
+            else if (y == max_y) {
+                min_x++;
+                y--;
+                x++;
+                curDirInd = (curDirInd+1)%4;
+            }
+            else if (x == min_x) {
+                min_y++;
+                x++;
+                y++;
+                curDirInd = (curDirInd+1)%4;
+            }
+            else if (y == min_y) {
+                max_x--;
+                y++;
+                x--;
+                curDirInd = (curDirInd+1)%4;
+            }
+        }
+
+        return result;
+    }
+
+    // 73. Set matrix zeroes
+    public void setZeroes(int[][] matrix) {
+        // Step 1: check if there are any zeros row-wise
+        // Step 2: if zero found, use a int[] arr to make the column to be changed to zero
+        // Step 3: set all the values in the rwo to zero
+        // Step 4: Set all the values in the column to zero
+
+        int[] setColumnToZero = new int[matrix[0].length];
+
+        for (int row = 0; row < matrix.length; row++) {
+            boolean rowHasZero = false;
+            for (int col = 0; col < matrix[row].length; col++) {
+                if (matrix[row][col] == 0) {
+                    setColumnToZero[col] = 1;
+                    rowHasZero = true;
+                }
+            }
+            if (!rowHasZero) {
+                continue;
+            }
+
+            Arrays.fill(matrix[row], 0);
+        }
+
+        for (int colInd = 0; colInd < setColumnToZero.length; colInd++) {
+            if (setColumnToZero[colInd] == 0) {
+                continue;
+            }
+
+            for (int row = 0; row < matrix.length; row++) {
+                matrix[row][colInd] = 0;
+            }
+        }
+    }
+
+    // 13. Roman to Integer, helper (using switch case instead of map)
+    private int romanToIntMap(char roman){
+        int result = 1;
+
+        switch (roman) {
+            case 'V' -> result = 5;
+            case 'X' -> result = 10;
+            case 'L' -> result = 50;
+            case 'C' -> result = 100;
+            case 'D' -> result = 500;
+            case 'M' -> result = 1000;
+        }
+
+        return result;
+    }
+
+    // 13. Roman to Integer
+    public int romanToInt(String s) {
+        int result = 0;
+        int currentIndex = 0;
+
+        while(currentIndex < s.length()) {
+            int currentValue = romanToIntMap(s.charAt(currentIndex++));
+
+            if (currentIndex >= s.length()) {
+                result = result + currentValue;
+                break;
+            }
+
+            int nextValue = romanToIntMap(s.charAt(currentIndex));
+
+            if (nextValue > currentValue) {
+                result = result + nextValue - currentValue;
+                currentIndex++;
+            }
+            else {
+                result = result + currentValue;
+            }
+        }
+
+        return result;
+    }
+
     // 67 Add Binary
     public String addBinary(String a, String b) {
 

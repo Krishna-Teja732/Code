@@ -1,4 +1,4 @@
-package MazeGenerator;
+package Algorithms.MazeGenerator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
