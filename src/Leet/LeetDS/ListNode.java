@@ -1,4 +1,4 @@
-package Leet.DataStructures;
+package Leet.LeetDS;
 
 public class ListNode {
     public int val;
@@ -9,4 +9,5 @@ public class ListNode {
         this.val = val;
     }
 
+    public ListNode() {}
 }

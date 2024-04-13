@@ -1,4 +1,4 @@
-package Leet.DataStructures;
+package Leet.LeetDS;
 
 public class TreeNode {
     public int val;

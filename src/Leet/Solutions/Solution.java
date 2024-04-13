@@ -1,14 +1,106 @@
 package Leet.Solutions;
-import Leet.DataStructures.GraphNode;
-import Leet.DataStructures.ListNode;
-import Leet.DataStructures.TreeNode;
-import Leet.DataStructures.Node;
-import Leet.utils.Helper;
+import Leet.LeetDS.GraphNode;
+import Leet.LeetDS.ListNode;
+import Leet.LeetDS.TreeNode;
+import Leet.LeetDS.Node;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
 public class Solution {
+
+    // 2. Add two numbers
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode result = new ListNode();
+        ListNode cur = result;
+        int carry = 0;
+
+        while(l1 != null || l2 !=null || carry!=0) {
+            int sum = carry;
+
+            if (l1 != null) {
+                sum = sum + l1.val;
+                l1 = l1.next;
+            }
+
+            if (l2 != null) {
+                sum = sum + l2.val;
+                l2 = l2.next;
+            }
+
+            ListNode newNode = new ListNode(sum%10);
+            cur.next = newNode;
+            cur = newNode;
+
+            carry = (sum - cur.val)/10;
+        }
+
+
+        return result.next;
+    }
+
+    // 1275. Find winner on a Tic tac toe game, helper
+    private boolean checkWinner(int[][] matrix, int turn) {
+        boolean majorDiagonal = true;
+        boolean minorDiagonal = true;
+
+        for (int[] ints : matrix) {
+            boolean flag = true;
+
+            for (int col = 0; col < matrix.length; col++) {
+                if (ints[col] != turn) {
+                    flag = false;
+                    break;
+                }
+            }
+
+            if (flag) {
+                return true;
+            }
+        }
+
+        for (int col = 0; col < matrix.length; col++) {
+            boolean flag = true;
+
+            for (int[] ints : matrix) {
+                if (ints[col] != turn) {
+                    flag = false;
+                    break;
+                }
+            }
+
+            if (flag) {
+                return true;
+            }
+        }
+
+        for (int index = 0; index < matrix.length; index++) {
+            majorDiagonal = majorDiagonal & (matrix[index][index] == turn);
+            minorDiagonal = minorDiagonal & (matrix[matrix.length - index - 1][index] == turn);
+        }
+
+        return majorDiagonal || minorDiagonal;
+    }
+
+    // 1275. Find winner on a Tic tac toe game
+    public String tictactoe(int[][] moves) {
+        int[][] matrix = new int[][] {{-1, -1, -1}, {-1, -1, -1}, {-1, -1, -1}};
+
+        int turn = 0;
+        for (int[] move: moves) {
+            matrix[move[0]][move[1]] = turn;
+            turn = (turn+1)%2;
+        }
+
+        if (checkWinner(matrix, 0)) {
+            return "A";
+        }
+        else if (checkWinner(matrix, 1)) {
+            return "B";
+        }
+
+        return moves.length!=9? "Pending":"Draw";
+    }
 
     // 1502. Can make arithmetic progression from sequence
     public boolean canMakeArithmeticProgression(int[] arr) {
@@ -103,16 +195,16 @@ public class Solution {
     // 73. Set matrix zeroes
     public void setZeroes(int[][] matrix) {
         // Step 1: check if there are any zeros row-wise
-        // Step 2: if zero found, use a int[] arr to make the column to be changed to zero
+        // Step 2: if zero found, use an int[] arr to make the column to be changed to zero
         // Step 3: set all the values in the rwo to zero
         // Step 4: Set all the values in the column to zero
 
         int[] setColumnToZero = new int[matrix[0].length];
 
-        for (int row = 0; row < matrix.length; row++) {
+        for (int[] ints : matrix) {
             boolean rowHasZero = false;
-            for (int col = 0; col < matrix[row].length; col++) {
-                if (matrix[row][col] == 0) {
+            for (int col = 0; col < ints.length; col++) {
+                if (ints[col] == 0) {
                     setColumnToZero[col] = 1;
                     rowHasZero = true;
                 }
@@ -121,7 +213,7 @@ public class Solution {
                 continue;
             }
 
-            Arrays.fill(matrix[row], 0);
+            Arrays.fill(ints, 0);
         }
 
         for (int colInd = 0; colInd < setColumnToZero.length; colInd++) {
@@ -852,7 +944,7 @@ public class Solution {
 
     // 120. Triangle
     public int minimumTotal(List<List<Integer>> triangle) {
-        return minimumTotal(triangle, 1, triangle.get(0), triangle.get(0).get(0));
+        return minimumTotal(triangle, 1, triangle.getFirst(), triangle.getFirst().getFirst());
     }
 
     // 120. Triangle
@@ -862,8 +954,8 @@ public class Solution {
             return minimum;
         }
         List<Integer> nextSumOfValues = new ArrayList<>();
-        nextSumOfValues.add(triangle.get(currentRowIndex).get(0)+sumOfValues.get(0));
-        int minimumForCurrentRow = nextSumOfValues.get(0);
+        nextSumOfValues.add(triangle.get(currentRowIndex).getFirst()+sumOfValues.getFirst());
+        int minimumForCurrentRow = nextSumOfValues.getFirst();
         for(int index = 1; index < currentRowIndex; index++){
             int curSum = Math.min(
                             triangle.get(currentRowIndex).get(index)+sumOfValues.get(index-1),
@@ -873,7 +965,7 @@ public class Solution {
         }
         if (currentRowIndex!=0){
             nextSumOfValues.add(triangle.get(currentRowIndex).get(currentRowIndex)+sumOfValues.get(currentRowIndex-1));
-            minimumForCurrentRow = Math.min(nextSumOfValues.get(nextSumOfValues.size()-1), minimumForCurrentRow);
+            minimumForCurrentRow = Math.min(nextSumOfValues.getLast(), minimumForCurrentRow);
         }
         return minimumTotal(triangle, currentRowIndex+1, nextSumOfValues, minimumForCurrentRow);
     }
@@ -901,6 +993,13 @@ public class Solution {
         return (int) result;
     }
 
+    // 1743. Restore the Array From Adjacent Pairs. Helper: Add entry adjacency list(in this case it is a HashMap)
+    public static void restoreArrayHelper(int key, int value, HashMap<Integer, List<Integer>> map){
+        List<Integer> values = map.getOrDefault(key, new ArrayList<>());
+        values.add(value);
+        map.put(key, values);
+    }
+
     // 1743. Restore the Array From Adjacent Pairs
     public int[] restoreArray(int[][] adjacentPairs) {
         int[] result = new int[adjacentPairs.length+1];
@@ -908,8 +1007,8 @@ public class Solution {
         // Construct adjacency list as a Map
         HashMap<Integer, List<Integer>> map = new HashMap<>();
         for(int[] pair: adjacentPairs){
-            Helper.restoreArrayHelper(pair[0], pair[1], map);
-            Helper.restoreArrayHelper(pair[1], pair[0], map);
+            restoreArrayHelper(pair[0], pair[1], map);
+            restoreArrayHelper(pair[1], pair[0], map);
         }
 
         // Get corner element i.e. element with one neighbour
@@ -925,7 +1024,7 @@ public class Solution {
             int prev = result[index-1];
             List<Integer> neighbours = map.remove(prev);
             if (neighbours.size() == 1){
-                result[index] = neighbours.get(0);
+                result[index] = neighbours.getFirst();
                 continue;
             }
             for (int neighbour: neighbours) {
@@ -938,12 +1037,23 @@ public class Solution {
         return result;
     }
 
+    // 2191. Sort the Jumbled Numbers, Helper
+    public static int getVal(int[] mappings, int val){
+        int res = 0, power = 0;
+        do{
+            res = res+(int)Math.pow(10, power)*mappings[val%10];
+            power++;
+            val = val/10;
+        }while(val>0);
+        return res;
+    }
+
     // 2191. Sort the Jumbled Numbers
     public int[] sortJumbled(int[] mapping, int[] nums) {
         int[][] arr = new int[nums.length][2];
         for(int index=0;index<nums.length;index++){
             arr[index][0] = nums[index];
-            arr[index][1] = Helper.getVal(mapping, nums[index]);
+            arr[index][1] = getVal(mapping, nums[index]);
         }
         Arrays.sort(arr, Comparator.comparingInt(o -> o[1]));
         for(int index=0;index<nums.length;index++){
@@ -953,6 +1063,7 @@ public class Solution {
     }
 
 
+    // 108. Convert Sorted Array to Binary Algorithms.Search Tree, Helper
     public void addNode(TreeNode root, TreeNode node){
         if(root.val<node.val){
             if(root.right==null){
@@ -1118,8 +1229,8 @@ public class Solution {
     public boolean checkPath2(HashMap<Integer, HashSet<Integer>> adjList, int index,int target){
         List<Integer> q = new ArrayList<>();
         q.add(index);
-        while(q.size()!=0){
-            int cur = q.remove(0);
+        while(!q.isEmpty()){
+            int cur = q.removeFirst();
             if(cur == target) return true;
             q.addAll(adjList.get(cur));
         }
@@ -1235,6 +1346,15 @@ public class Solution {
         return res;
     }
 
+    // 1162. As Far from Land as Possible, Helper
+    public int manhattanDist(int[] coord1, int[] coord2){
+        int res = 0;
+        for(int index=0;index<coord1.length;index++){
+            res+= Math.abs(coord1[index]-coord2[index]);
+        }
+        return res;
+    }
+
     // 1162. As Far from Land as Possible
     public int maxDistance(int[][] grid) {
         List<int[]> land = new ArrayList<>(), water = new ArrayList<>();
@@ -1243,10 +1363,10 @@ public class Solution {
                 water.add(new int[]{row, col});
             }
         }
-        int res = grid[water.get(0)[0]][water.get(0)[1]];
+        int res = grid[water.getFirst()[0]][water.getFirst()[1]];
         for(int[] l:land){
             for(int[] w:water){
-                int dist = new Helper().manhattanDist(l, w);
+                int dist = manhattanDist(l, w);
                 if(grid[w[0]][w[1]]<dist) grid[w[0]][w[1]] = dist;
             }
         }
@@ -1254,6 +1374,18 @@ public class Solution {
             if(grid[w[0]][w[1]]>res) res = grid[w[0]][w[1]];
         }
         return res;
+    }
+
+    // 480. Sliding Window Median, helper
+    public static int binarySearch(ArrayList<Integer> arr, int target){
+        int mid = (arr.size()-1)/2, beg = 0, end = arr.size()-1;
+        while(beg<end){
+            if(arr.get(mid) == target) return mid;
+            if(arr.get(mid)>target) end = mid-1;
+            else beg = mid+1;
+            mid = (beg+end)/2;
+        }
+        return mid;
     }
 
     // 480. Sliding Window Median
@@ -1267,8 +1399,7 @@ public class Solution {
             System.out.println(window);
             if(k%2==0) res[resInd++] = window.get(k/2)/2.0+window.get(k/2-1)/2.0;
             else res[resInd++] = window.get(k/2);
-            new Helper();
-            window.remove(Helper.binarySearch(window, nums[beg]));
+            window.remove(binarySearch(window, nums[beg]));
             int ind=0;
             while(ind<window.size()) {
                 if(window.get(ind)>nums[end]) break;
@@ -1283,10 +1414,25 @@ public class Solution {
         return res;
     }
 
+    //576. Out of Boundary Paths, helper
+    public int findPaths(int x, int y,int m, int n, int maxMove, int res) {
+        if(maxMove==0){
+            if(x<0 || y<0 || x>=m || y>=n){
+                return (++res)%((int)Math.pow(10, 9)+7);
+            }
+            return res;
+        }
+        findPaths(x+1, y, m, n, maxMove-1, res);
+        findPaths(x-1, y, m, n, maxMove-1, res);
+        findPaths(x, y+1, m, n, maxMove-1, res);
+        findPaths(x, y-1, m, n, maxMove-1, res);
+        return res;
+    }
+
     //576. Out of Boundary Paths
     public int findPaths(int m, int n, int maxMove, int startRow, int startColumn) {
         int res = 0;
-        return new Helper().findPaths(startRow, startColumn, m, n, maxMove, res);
+        return findPaths(startRow, startColumn, m, n, maxMove, res);
     }
 
     //2155. All Divisions With the Highest Score of a Binary Array
@@ -1309,9 +1455,31 @@ public class Solution {
         return res;
     }
 
+    //222. Count Complete Tree Nodes, Helper
+    public int depth(TreeNode root){
+        int res = 0;
+        while(root!=null){
+            root=root.left;
+            res++;
+        }
+        return res;
+    }
+
+    //222. Count Complete Tree Nodes, Helper
+    public int countNodes(TreeNode n1, TreeNode n2, int res, int depth){
+        if(n1 == null) return res;
+        int d1 = depth(n1), d2 = depth(n2), count;
+        if(d1 == d2){
+            count = countNodes(n2.left, n2.right, res + (int)Math.pow(2, depth), depth-1);
+        }else{
+            count = countNodes(n1.left, n1.right, res + (int)Math.pow(2, depth-1), depth-1);
+        }
+        return count;
+    }
+
     //222. Count Complete Tree Nodes
     public int countNodes(TreeNode root) {
-        /* Totlal number of nodes in full binary tree is 2^(n)-1 
+        /* Total number of nodes in full binary tree is 2^(n)-1
          * where n is the depth of the tree. recursivley check depth of left and
          * right subtree. If the depth of right tree is less than left tree, 
          * then left subtree is a full binary tree, next time check using right subtree. 
@@ -1319,15 +1487,39 @@ public class Solution {
          * next iteration check with the left subtree.  
         */
         if(root==null) return 0;
-        int d = new Helper().depth(root);
-        return new Helper().countNodes(root.left, root.right, 1, d-1);
+        int d = depth(root);
+        return countNodes(root.left, root.right, 1, d-1);
     }
-    
+
+    // 74. Algorithms. Search 2D matrix
+    public static boolean binarySearch(int[] arr, int target){
+        int mid = (arr.length-1)/2, beg = 0, end = arr.length-1;
+        while(beg<end){
+            if(arr[mid] == target) return true;
+            if(arr[mid]>target) end = mid-1;
+            else beg = mid+1;
+            mid = (beg+end)/2;
+        }
+        return arr[mid] == target;
+    }
+
+    // 74. Algorithms.Search a 2D Matrix, Helper
+    public static int modSearch(int[][] arr, int target){
+        int mid = (arr.length-1)/2, beg = 0, end = arr.length-1;
+        while(beg<end){
+            if(arr[mid][0] == target) return mid;
+            if(arr[mid][0] >target) end = mid-1;
+            else beg = mid+1;
+            mid = (beg+end)/2;
+        }
+        return mid;
+    }
+
     // 74. Algorithms.Search a 2D Matrix
     public boolean searchMatrix(int[][] matrix, int target) {
-        int index = Helper.modSearch(matrix, target);
+        int index = modSearch(matrix, target);
         if(matrix[index][0]>target && index!=0) index=index-1;
-        return Helper.binarySearch(matrix[index], target);
+        return binarySearch(matrix[index], target);
     }
 
     //566. Reshape the Matrix
@@ -1359,9 +1551,9 @@ public class Solution {
 
         int maxSum = Integer.MIN_VALUE;
         int minSum = Integer.MAX_VALUE;
-        for (int index = 0; index<sum.length; index++) {
-            maxSum = Math.max(maxSum, sum[index]);
-            minSum = Math.min(minSum, sum[index]);
+        for (int i : sum) {
+            maxSum = Math.max(maxSum, i);
+            minSum = Math.min(minSum, i);
         }
         return Math.max(res, maxSum-minSum);
     }
@@ -1403,10 +1595,22 @@ public class Solution {
         }
     }
 
+    //1324. Print Words Vertically, Helper
+    public List<Integer> initIndex(char[] arr){
+        List<Integer> res = new ArrayList<>();
+        res.add(0);
+        for(int index=1; index<arr.length;index++){
+            if(arr[index-1]==' '){
+                res.add(index);
+            }
+        }
+        return res;
+    }
+
     //1324. Print Words Vertically
     public List<String> printVertically(String s) {
         char[] arr = s.toCharArray();
-        List<Integer> indices = new Helper().initIndex(arr);
+        List<Integer> indices = initIndex(arr);
         IntStream.range(0, indices.size()).parallel().forEach(index->{
             int val = indices.get(index);
             if(arr[val]!=' ') indices.set(index, val+1);
@@ -1414,7 +1618,21 @@ public class Solution {
         System.out.println(indices);
         return new ArrayList<>();
     }
-    
+
+    //331. Verify Preorder Serialization of a Binary Tree
+    public int verifyPreorder(int index, String[] preorder, Stack<String> stack){
+        if(index==-1) return -1;
+        if(index>=preorder.length) return index;
+        if(preorder[index].equals("#")) return index+1;
+        if(index+2>preorder.length) return -1;
+        int curIndex = index;
+        stack.push(preorder[index]);
+        index = verifyPreorder(verifyPreorder(index+1, preorder, stack), preorder, stack);
+        if(stack.peek().equals(preorder[curIndex])) stack.pop();
+        else return preorder.length;
+        return index;
+    }
+
     //331. Verify Preorder Serialization of a Binary Tree
     boolean isValidSerialization(String preorder) {
         String[] arr = preorder.split(",");
@@ -1423,7 +1641,7 @@ public class Solution {
         }
         if(!arr[arr.length-1].equals("#") || !arr[arr.length-2].equals("#")) return false;
         Stack<String> stack = new Stack<>();
-        int index = new Helper().verifyPreorder(0, arr, stack);
+        int index = verifyPreorder(0, arr, stack);
         if(index<arr.length) return false;
         return stack.isEmpty();
     }
@@ -1452,9 +1670,19 @@ public class Solution {
         return result;
     }
 
+    //938. Range Sum of BST, Helper
+    public int findSum(TreeNode root, int low, int high, int result){
+        if(root==null) return 0;
+        if(root.val<low) result+=findSum(root.right, low, high, result);
+        else if(root.val>high) result+=findSum(root.left, low, high, result);
+        else result+=findSum(root.left, low, high, result)+findSum(root.right, low, high, result);
+        if(root.val>=low && root.val<=high) result=result+root.val;
+        return result;
+    }
+
     //938. Range Sum of BST
     public int rangeSumBST(TreeNode root, int low, int high){
-        return new Helper().findSum(root, low, high, 0);
+        return findSum(root, low, high, 0);
     }
     
     //1437. Check If All 1's Are at Least Length K Places Away
@@ -1518,6 +1746,27 @@ public class Solution {
         return result.stream().mapToInt(num -> num).toArray();
     }
 
+    //1268. Algorithms Search Suggestions System, Helper
+    //insert in lexicographic order and list max size is 3
+    public static void insertInList(List<String> result, String val){
+        int ind;
+        if(result.size()<3){
+            for(ind=0;ind<result.size();ind++){
+                if(result.get(ind).compareTo(val)>0){
+                    break;
+                }
+            }
+            result.add(ind, val);
+        }else{
+            for(ind=0;ind<3;ind++){
+                if(result.get(ind).compareTo(val)>0){
+                    result.set(ind, val);
+                    break;
+                }
+            }
+        }
+    }
+
     //1268. Algorithms.Search Suggestions System
     public List<List<String>> suggestedProducts(String[] products, String searchWord) {
         List<List<String>> results = new ArrayList<>();
@@ -1528,7 +1777,7 @@ public class Solution {
                 if(flags[productInd]=='\0') continue;
                 if(products[productInd].charAt(ind)==searchWord.charAt(ind)){
                     flags[ind] = '1';
-                    result = Helper.insertInList(result, products[productInd]);
+                    insertInList(result, products[productInd]);
                 }
             }
             results.add(result);
@@ -1643,7 +1892,7 @@ public class Solution {
     
     
     public int numSplits(String s){
-        if(s.length()==0) return 0;
+        if(s.isEmpty()) return 0;
         int[] map1=new int[26], map2=new int[26];
         int count1=1,count2=0,res=0,size=s.length(),ch;
         map1[s.charAt(0)-'a']=1;

@@ -1,4 +1,4 @@
-package Leet.DataStructures;
+package Leet.LeetDS;
 
 import java.util.HashSet;
 
