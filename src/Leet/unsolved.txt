@@ -11,6 +11,7 @@
 565 - time limit
 1711 -time limit
 274 - improve using binary search
+463 - improve solution (Best solution uses xor)
 
 53
 - Wrong answer.

@@ -9,6 +9,146 @@ import java.util.stream.IntStream;
 
 public class Solution {
 
+    // 1020. Number of enclaves, helper
+    public void sinkLand(int[][] grid, int x, int y) {
+        if (x == grid.length ||  y == grid[0].length || x < 0 || y < 0) {
+            return;
+        }
+
+        if (grid[x][y]==0) {
+            return;
+        }
+
+        grid[x][y] = 0;
+
+        sinkLand(grid, x+1, y);
+        sinkLand(grid, x-1, y);
+        sinkLand(grid, x, y+1);
+        sinkLand(grid, x, y-1);
+    }
+
+    // 1020. Number of enclaves
+    public int numEnclaves(int[][] grid) {
+        for (int x = 0; x < grid.length; x++) {
+            sinkLand(grid, x, 0);
+            sinkLand(grid, x, grid[0].length-1);
+        }
+
+        for (int y = 0; y < grid[0].length; y++) {
+            sinkLand(grid, 0, y);
+            sinkLand(grid, grid.length-1, y);
+        }
+
+        int result = 0;
+        for(int[] row: grid) {
+            for (int val: row) {
+                result = result + val;
+            }
+        }
+
+        return result;
+    }
+
+    // 990 Satisfiability of equality equations, helper
+    private int findParent(int[] values, int index) {
+        while(values[index] != -1) {
+            index = values[index];
+        }
+
+        return index;
+    }
+
+    // 990 Satisfiability of equality equations
+    public boolean equationsPossible(String[] equations) {
+        int[] values = new int[26];
+        Arrays.fill(values, -1);
+
+        for (String equation: equations) {
+            if (equation.charAt(1) == '!') {
+                continue;
+            }
+            int element1 = equation.charAt(0) - 'a';
+            int element2 = equation.charAt(3) - 'a';
+
+            int parent1 = findParent(values, element1);
+            int parent2 = findParent(values, element2);
+
+            if (parent1 == parent2) {
+                continue;
+            }
+
+            values[parent2] = parent1;
+        }
+
+
+        for (String equation: equations) {
+            if (equation.charAt(1) == '=') {
+                continue;
+            }
+
+            int element1 = equation.charAt(0) - 'a';
+            int element2 = equation.charAt(3) - 'a';
+
+            int parent1 = findParent(values, element1);
+            if (parent1 == findParent(values, element2)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // 463. Island Perimeter, helper
+    private int islandPerimeterHelper(int x, int y, int[][] grid) {
+        if (grid[x][y] == 0) {
+            return 0;
+        }
+
+        int result = 0;
+        boolean checkPrevious = x!=0;
+        boolean checkNext = x != grid.length - 1;
+
+        if (!checkPrevious || !checkNext) {
+            result++;
+        }
+
+        if (checkPrevious && grid[x-1][y] == 0){
+            result++;
+        }
+        if (checkNext && grid[x+1][y] == 0) {
+            result++;
+        }
+
+        checkPrevious = y != 0;
+        checkNext = y != grid[x].length - 1;
+
+        if (!checkPrevious || !checkNext) {
+            result++;
+        }
+
+        if (checkPrevious && grid[x][y-1] == 0){
+            result++;
+        }
+        if (checkNext && grid[x][y+1] == 0) {
+            result++;
+        }
+
+        return result;
+    }
+
+    // 463. Island Perimeter
+    public int islandPerimeter(int[][] grid) {
+        int result = 0;
+
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[x].length; y++) {
+                result += islandPerimeterHelper(x, y, grid);
+            }
+        }
+
+        return result;
+    }
+
     // 2. Add two numbers
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
         ListNode result = new ListNode();
@@ -1306,20 +1446,21 @@ public class Solution {
             coins[beg] = coins[end];
             coins[end] = temp;
         }
-        return coinChage(coins, amount, 0, 0);
+        return coinChange(coins, amount, 0, 0);
     }
-    
-    public int coinChage(int[] coins, int amt, int index, int res){
+
+    // 322. Coin Change, Helper
+    public int coinChange(int[] coins, int amt, int index, int res){
         if(index==coins.length && amt!=0) return -1;
         if(amt==0) return res;
         int curres = -1;
         for(int cur = index; cur<coins.length; cur++){
             int rem = amt/coins[index];
             while(rem>0 && curres==-1){
-                curres = coinChage(coins, amt - rem*coins[index], index + 1, rem+res);
+                curres = coinChange(coins, amt - rem*coins[index], index + 1, rem+res);
                 rem--;
             }
-            curres = coinChage(coins, amt, index + 1, res);
+            curres = coinChange(coins, amt, index + 1, res);
             if(curres!=-1) break;
         }
         return curres;
