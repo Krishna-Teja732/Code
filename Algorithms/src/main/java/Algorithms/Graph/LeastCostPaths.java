@@ -5,8 +5,9 @@ import java.util.*;
 import DS.GraphEdge;
 
 /**
- * Use Dijkstra's algorithm to find the shortest path between source and all other nodes in graph
- * **/
+ * Use Dijkstra's algorithm to find the shortest path between source and all
+ * other nodes in graph
+ **/
 public class LeastCostPaths {
 
     private final PriorityQueue<GraphEdge> edges;
@@ -15,7 +16,7 @@ public class LeastCostPaths {
 
     private int[] costMatrix;
 
-    private  HashMap<Integer, Integer> leastCostPath;
+    private HashMap<Integer, Integer> leastCostPath;
 
     LeastCostPaths() {
         edges = new PriorityQueue<>();
@@ -23,20 +24,20 @@ public class LeastCostPaths {
     }
 
     private void edgesToExplore(int sourceNode, int[][] adjMatrix, int costToNode) {
-        for (int neighbour = 0; neighbour< adjMatrix.length; neighbour++) {
-            if (adjMatrix[sourceNode][neighbour]==-1 || visited.contains(neighbour)) {
+        for (int neighbour = 0; neighbour < adjMatrix.length; neighbour++) {
+            if (adjMatrix[sourceNode][neighbour] == -1 || visited.contains(neighbour)) {
                 continue;
             }
-            edges.add(new GraphEdge(sourceNode, neighbour, adjMatrix[sourceNode][neighbour]+costToNode));
+            edges.add(new GraphEdge(sourceNode, neighbour, adjMatrix[sourceNode][neighbour] + costToNode));
         }
     }
 
-    public void findLeastCostPaths(int sourceNode, int[][] adjMatrix){
+    public void findLeastCostPaths(int sourceNode, int[][] adjMatrix) {
         costMatrix = new int[adjMatrix[sourceNode].length];
         leastCostPath = new HashMap<>();
         for (int index = 0; index < adjMatrix[sourceNode].length; index++) {
             costMatrix[index] = adjMatrix[sourceNode][index];
-            if (adjMatrix[sourceNode][index]!=-1) {
+            if (adjMatrix[sourceNode][index] != -1) {
                 leastCostPath.put(index, sourceNode);
             } else {
                 leastCostPath.put(index, -1);
@@ -79,15 +80,13 @@ public class LeastCostPaths {
     }
 
     public static void main(String[] args) {
-        int[][] adjMatrix =
-                new int[][] {
-                        {-1, 2, 5, 1, -1, -1},
-                        {2, -1, 3, 2, -1, -1},
-                        {5, 3, -1, 3, 1, 5},
-                        {1, 2, 3, -1, 1, -1},
-                        {-1, -1, 1, 1, -1, 2},
-                        {-1, -1, 5, -1, 2, -1}
-                };
+        int[][] adjMatrix = new int[][] {
+                { -1, 10, 3, -1, -1 },
+                { -1, -1, 1, 2, -1, -1 },
+                { -1, 4, -1, 8, 2 },
+                { -1, -1, -1, -1, 7 },
+                { -1, -1, -1, 9, -1 },
+        };
 
         LeastCostPaths obj = new LeastCostPaths();
         obj.findLeastCostPaths(0, adjMatrix);
