@@ -1,7 +1,12 @@
 package Leet;
 
+import Leet.Solutions.Solution;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("hello world from Leet package");
+        Solution obj = new Solution();
+        for (int i = 1; i < 7; i++) {
+            System.out.println(obj.findTheWinner(6, i));
+        }
     }
 }

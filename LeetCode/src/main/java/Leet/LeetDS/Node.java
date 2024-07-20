@@ -15,4 +15,8 @@ public class Node {
         this.key = key;
         this.val = val;
     }
+
+    public Node(int val) {
+        this.val = val;
+    }
 }
