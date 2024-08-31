@@ -9,37 +9,35 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class Solution {
+    // 56. Merge intervals
+    public int[][] merge(int[][] intervals) {
+        // Sort the array based on starting time
+        Arrays.sort(intervals, new Comparator<int[]>() {
+            public int compare(int[] arg0, int[] arg1) {
+                return arg0[0] - arg1[0];
+            };
+        });
 
-    public int findTheWinner(int n, int k) {
-        Node root = new Node(1);
-        Node tail = root;
-        for (int val = 2; val <= n; val++) {
-            tail.next = new Node(val);
-            tail = tail.next;
-        }
-        tail.next = root;
-        while (n > 1) {
-            int iter = k;
-            while (iter-- > 1) {
-                Node temp = root;
-                root = root.next;
-                tail = temp;
-                tail.next = root;
+        List<int[]> result = new ArrayList<>(intervals.length);
+        int[] currentInterval = intervals[0];
+        for (int index = 1; index < intervals.length; index++) {
+            if (currentInterval[1] >= intervals[index][0]) {
+                currentInterval[1] = Math.max(intervals[index][1], currentInterval[1]);
+            } else {
+                result.add(currentInterval);
+                currentInterval = intervals[index];
             }
-            tail.next = root.next;
-            root = root.next;
-            n--;
         }
-        return root.val;
-    }
+        if (currentInterval != null) {
+            result.add(currentInterval);
+        }
 
-    private void printList(Node root) {
-        Node cur = root;
-        do {
-            System.out.print(cur.val + " ");
-            cur = cur.next;
-        } while (cur != root);
-        System.out.println();
+        // Copy to primitive array
+        int[][] finalResult = new int[result.size()][];
+        for (int index = 0; index < result.size(); index++) {
+            finalResult[index] = result.get(index);
+        }
+        return finalResult;
     }
 
     // 1020. Number of enclaves, helper
