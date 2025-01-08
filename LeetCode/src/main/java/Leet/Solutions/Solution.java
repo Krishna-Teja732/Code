@@ -9,6 +9,35 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class Solution {
+    // 328. Odd Even Linked List
+    public ListNode oddEvenList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        ListNode oddTail = head;
+        ListNode oddNode = head.next.next;
+        ListNode oddNodeParent = head.next;
+
+        while (oddNodeParent != null && oddNode != null) {
+            // Delete odd Node
+            oddNodeParent.next = oddNode.next;
+
+            // Insert oddNode at tail
+            oddNode.next = oddTail.next;
+            oddTail.next = oddNode;
+
+            // Update pointers
+            oddTail = oddTail.next;
+            oddNodeParent = oddNodeParent.next;
+            if (oddNodeParent != null) {
+                oddNode = oddNodeParent.next;
+            }
+        }
+
+        return head;
+    }
+
     // 56. Merge intervals
     public int[][] merge(int[][] intervals) {
         // Sort the array based on starting time
