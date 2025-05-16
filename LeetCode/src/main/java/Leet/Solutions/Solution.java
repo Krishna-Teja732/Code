@@ -9,6 +9,182 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class Solution {
+    // 33. Binary search helper
+    public int searchRotatedArray(int[] nums, int start, int end, int target) {
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            }
+            if (nums[mid] > target) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
+        }
+        return -1;
+    }
+
+    // 33. Search in rotated sorted array
+    // Approach:
+    // 1. Find pivot index in O(lgn) using binary search
+    // 2. If target > nums[nums.length - 1]: then the element is to the left of
+    // pivot, else element is to the right of the pivot
+    public int searchRotatedArray(int[] nums, int target) {
+        int start = 0;
+        int end = nums.length - 1;
+        // If no pivot index is found, use normal binary search
+        int pivotIndex = -1;
+
+        // Finding pivot index
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (mid + 1 < nums.length && nums[mid] > nums[mid + 1]) {
+                pivotIndex = mid;
+                break;
+            }
+            if (nums[mid] > nums[nums.length - 1]) {
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+
+        if (target > nums[nums.length - 1]) {
+            return searchRotatedArray(nums, 0, pivotIndex, target);
+        }
+        return searchRotatedArray(nums, pivotIndex + 1, nums.length - 1, target);
+    }
+
+    // 35. Search Insert Position
+    public int searchInsert(int[] nums, int target) {
+        int start = 0;
+        int end = nums.length - 1;
+
+        while (start < end) {
+            int mid = (start + end) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            }
+
+            if (nums[mid] > target) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
+        }
+
+        return nums[start] < target ? start + 1 : start;
+    }
+
+    // 34. Find First and Last Position of Element in Sorted Array
+    public int[] searchRange(int[] nums, int target) {
+        if (nums.length == 0) {
+            return new int[] { -1, -1 };
+        }
+        int minInd = nums[0] == target ? 0 : -1;
+        int maxInd = nums[nums.length - 1] == target ? nums.length - 1 : -1;
+
+        int start = 0, end = nums.length - 1;
+        while (start <= end && minInd != 0) {
+            int mid = (start + end) / 2;
+
+            if (nums[mid] == target && nums[mid - 1] < target) {
+                minInd = mid;
+                break;
+            }
+
+            if (nums[mid] >= target) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
+        }
+
+        start = 0;
+        end = nums.length - 1;
+        while (start <= end && maxInd != nums.length - 1) {
+            int mid = (start + end) / 2;
+
+            if (nums[mid] == target && nums[mid + 1] > target) {
+                maxInd = mid;
+                break;
+            }
+
+            if (nums[mid] <= target) {
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+        return new int[] { minInd, maxInd };
+    }
+
+    // 148. Sort List helper
+    private void swap(ListNode n1, ListNode n2) {
+        int temp = n1.val;
+        n1.val = n2.val;
+        n2.val = temp;
+    }
+
+    // 148. Sort List helper
+    private ListNode pickRandomNode(ListNode startNode, ListNode endNode, int listLength) {
+        double thresh = 1 / listLength;
+        double step = 1 / listLength;
+        Random random = new Random();
+
+        while (startNode != endNode) {
+            if (random.nextDouble() >= thresh) {
+                break;
+            }
+            startNode = startNode.next;
+            thresh += step;
+        }
+        return startNode;
+    }
+
+    // 148. Sort List helper
+    private void sortListHelper(ListNode startNode, ListNode endNode, ListNode startNodeParent, int listLength) {
+        if (startNode == endNode || endNode == null || endNode.next == startNode) {
+            return;
+        }
+
+        ListNode pivotNodeParent = startNodeParent;
+        ListNode pivotNode = startNode;
+        ListNode currentNode = startNode;
+
+        // Randomized pivot
+        swap(pickRandomNode(startNode, endNode, listLength), endNode);
+
+        int leftSubarrayLen = 0;
+        while (currentNode != endNode) {
+            if (currentNode.val < endNode.val) {
+                swap(currentNode, pivotNode);
+                pivotNodeParent = pivotNode;
+                pivotNode = pivotNode.next;
+                leftSubarrayLen++;
+            }
+            currentNode = currentNode.next;
+        }
+        swap(pivotNode, endNode);
+
+        // Find Node right before pivot Node
+        sortListHelper(startNode, pivotNodeParent, startNodeParent, leftSubarrayLen);
+        sortListHelper(pivotNode.next, endNode, pivotNode, listLength - leftSubarrayLen);
+    }
+
+    // 148. Sort List
+    public ListNode sortList(ListNode head) {
+        ListNode endNode = head;
+        int len = 0;
+        while (endNode != null && endNode.next != null) {
+            len++;
+            endNode = endNode.next;
+        }
+        sortListHelper(head, endNode, null, len);
+        return head;
+    }
+
     // 328. Odd Even Linked List
     public ListNode oddEvenList(ListNode head) {
         if (head == null || head.next == null) {
