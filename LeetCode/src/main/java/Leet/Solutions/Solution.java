@@ -6,9 +6,169 @@ import Leet.LeetDS.TreeNode;
 import Leet.LeetDS.Node;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class Solution {
+    public double pow(double base, double exponent, int max_bound) {
+        double result = 1;
+        while (exponent > 0) {
+            if (exponent % 2 != 0) {
+                result = (result * base) % max_bound;
+                exponent--;
+            }
+            base = (base * base) % max_bound;
+            exponent = exponent / 2;
+        }
+        return result;
+    }
+
+    public int countGoodNumbers(long n) {
+        int max_bound = (int) Math.pow(10, 9) + 7;
+        double result = pow(4, Math.floor(n / 2.0), max_bound) % max_bound;
+        result = (result * pow(5, Math.ceil(n / 2.0), max_bound)) % max_bound;
+        return (int) (result);
+    }
+
+    // 451. Helper
+    public char findMaxChar(int[] freq) {
+        int maxInd = 0;
+        int maxFreq = freq[0];
+
+        for (int index = 1; index < freq.length; index++) {
+            if (maxFreq < freq[index]) {
+                maxInd = index;
+                maxFreq = freq[index];
+            }
+        }
+
+        return (char) maxInd;
+    }
+
+    // 451. Sort Characters by Frequency
+    public String frequencySort(String s) {
+        char[] array = s.toCharArray();
+        int[] freq = new int[75];
+        for (char ch : array) {
+            freq[ch - '0']++;
+        }
+        StringBuilder result = new StringBuilder();
+        while (result.length() < array.length) {
+            char ch = findMaxChar(freq);
+            char append_char = (char) (ch + '0');
+            while (freq[ch]-- > 0) {
+                result.append(append_char);
+            }
+        }
+        return result.toString();
+    }
+
+    // 796. Rotate String
+    public boolean rotateString(String s, String goal) {
+        if (s.length() != goal.length()) {
+            return false;
+        }
+        if (s.equals(goal)) {
+            return true;
+        }
+
+        for (int index = 1; index < s.length(); index++) {
+            if (goal.equals(s.substring(index) + s.substring(0, index))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // 205. Isomorphic Strings
+    public boolean isIsomorphic(String s, String t) {
+        char[] map = new char[128];
+        for (int index = 0; index < s.length(); index++) {
+            if (map[s.charAt(index)] == '\u0000') {
+                map[s.charAt(index)] = t.charAt(index);
+                continue;
+            }
+            if (map[s.charAt(index)] != t.charAt(index)) {
+                return false;
+            }
+        }
+        char[] visited = new char[128];
+        for (char ch : map) {
+            if (ch == '\u0000') {
+                continue;
+            }
+            if (visited[ch] != '\u0000') {
+                return false;
+            }
+            visited[ch] = 1;
+        }
+        return true;
+    }
+
+    // 1903. Larget odd number substring
+    public String largestOddNumber(String num) {
+        int index = num.length() - 1;
+        for (; index >= 0; index--) {
+            if (((num.charAt(index) - '0') & 1) == 1) {
+                break;
+            }
+        }
+        return index == -1 ? "" : num.substring(0, index + 1);
+    }
+
+    // 1021. Remove Outermost Parentheses
+    public String removeOuterParentheses(String s) {
+        int credit = 0;
+        StringBuilder result = new StringBuilder();
+        for (char ch : s.toCharArray()) {
+            if (credit == 0 && ch == '(') {
+                credit++;
+                continue;
+            }
+            if (credit == 1 && ch == ')') {
+                credit--;
+                continue;
+            }
+            credit = ch == '(' ? credit + 1 : credit - 1;
+            result.append(ch);
+        }
+        return result.toString();
+    }
+
+    // 540. Single Element Sorted Array
+    // Hint :
+    // If there are no single duplicates in the array, for all odd index i,
+    // nums[i] will be equal to nums[i + 1]
+    public int singleNonDuplicate(int[] nums) {
+        if (nums.length == 1) {
+            return nums[0];
+        }
+        int start = 0;
+        int end = nums.length - 1;
+
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if ((mid == 0 || nums[mid] != nums[mid - 1]) && (mid == nums.length - 1 || nums[mid] != nums[mid + 1])) {
+                return nums[mid];
+            }
+
+            if (mid % 2 == 0) {
+                if (nums[mid] == nums[mid + 1]) {
+                    start = mid + 1;
+                } else {
+                    end = mid - 1;
+                }
+            } else {
+                if (nums[mid] == nums[mid + 1]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+            }
+        }
+
+        return -1;
+    }
+
     // 33. Binary search helper
     public int searchRotatedArray(int[] nums, int start, int end, int target) {
         while (start <= end) {
@@ -2022,31 +2182,6 @@ public class Solution {
             resind = resind - 1;
             ind2 = ind2 - 1;
         }
-    }
-
-    // 1324. Print Words Vertically, Helper
-    public List<Integer> initIndex(char[] arr) {
-        List<Integer> res = new ArrayList<>();
-        res.add(0);
-        for (int index = 1; index < arr.length; index++) {
-            if (arr[index - 1] == ' ') {
-                res.add(index);
-            }
-        }
-        return res;
-    }
-
-    // 1324. Print Words Vertically
-    public List<String> printVertically(String s) {
-        char[] arr = s.toCharArray();
-        List<Integer> indices = initIndex(arr);
-        IntStream.range(0, indices.size()).parallel().forEach(index -> {
-            int val = indices.get(index);
-            if (arr[val] != ' ')
-                indices.set(index, val + 1);
-        });
-        System.out.println(indices);
-        return new ArrayList<>();
     }
 
     // 331. Verify Preorder Serialization of a Binary Tree
