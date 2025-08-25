@@ -8,24 +8,196 @@ import Leet.LeetDS.Node;
 import java.util.*;
 
 public class Solution {
-    public double pow(double base, double exponent, int max_bound) {
-        double result = 1;
-        while (exponent > 0) {
-            if (exponent % 2 != 0) {
-                result = (result * base) % max_bound;
-                exponent--;
+
+    // 1493. Longest Subarray of 1's After Deleting One Element
+    public int longestSubarray(int[] nums) {
+        int result = 0;
+        int startIndex = 0;
+        int curIndex = 1;
+
+        while (curIndex < nums.length) {
+            while (curIndex < nums.length && nums[curIndex] == 0) {
+                curIndex++;
+                startIndex++;
             }
-            base = (base * base) % max_bound;
-            exponent = exponent / 2;
+            if (curIndex >= nums.length) {
+                break;
+            }
+            while (curIndex < nums.length && nums[curIndex] == 1) {
+                nums[startIndex] += 1;
+                curIndex++;
+            }
+            startIndex++;
+            curIndex++;
+            nums[startIndex] = 0;
+        }
+
+        return result == nums.length ? result - 1 : result;
+    }
+
+    // 498. Diagonal Traverse
+    public int[] findDiagonalOrder(int[][] mat) {
+        int[] result = new int[mat.length * mat[0].length];
+        int resultIndex = 0;
+        int x_direction = -1, y_direction = +1;
+        int x_ind = 0, y_ind = 0;
+
+        while (resultIndex < result.length) {
+            if (x_ind < 0 || x_ind >= mat.length || y_ind < 0 || y_ind >= mat[x_ind].length) {
+                x_direction *= -1;
+                y_direction *= -1;
+            }
+            result[resultIndex++] = mat[x_ind][y_ind];
+
+            x_ind += x_direction;
+            y_ind += y_direction;
+
+            if (x_ind < 0 || x_ind >= mat.length || y_ind < 0 || y_ind >= mat[x_ind].length) {
+                x_direction *= -1;
+                y_direction *= -1;
+            }
+            if (x_ind < 0 || x_ind >= mat.length) {
+                x_ind += x_direction;
+                y_ind += y_direction;
+                y_ind++;
+            } else if (y_ind < 0 || y_ind >= mat[x_ind].length) {
+                x_ind += x_direction;
+                y_ind += y_direction;
+                x_ind++;
+            }
         }
         return result;
     }
 
-    public int countGoodNumbers(long n) {
-        int max_bound = (int) Math.pow(10, 9) + 7;
-        double result = pow(4, Math.floor(n / 2.0), max_bound) % max_bound;
-        result = (result * pow(5, Math.ceil(n / 2.0), max_bound)) % max_bound;
-        return (int) (result);
+    // 3195. Find the Minimum Area to Cover All Ones I
+    public int minimumArea(int[][] grid) {
+        // Find the points that are furthest to the left, right, top and bottom
+        int leftY = grid.length;
+        int rightY = 0;
+        int topX = grid.length;
+        int downX = 0;
+
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[x].length; y++) {
+                if (grid[x][y] == 0) {
+                    continue;
+                }
+
+                leftY = Math.min(leftY, y);
+                rightY = Math.max(rightY, y);
+                topX = Math.min(topX, x);
+                downX = Math.max(downX, x);
+            }
+        }
+
+        return (downX - topX + 1) * (rightY - leftY + 1);
+    }
+
+    // 151. Reverse words helper
+    private void reverseWord(char[] input, int start, int end) {
+        while (start < end) {
+            char temp = input[start];
+            input[start++] = input[end];
+            input[end--] = temp;
+        }
+    }
+
+    // 151. Reverse words
+    public String reverseWords(String s) {
+        char[] result = new char[s.length() + 1];
+        char[] input = s.toCharArray();
+        int resultIndex = 0;
+        int inputIndex = s.length() - 1;
+        while (inputIndex > -1) {
+            while (inputIndex > -1 && input[inputIndex] == ' ') {
+                inputIndex--;
+            }
+            int startIndex = resultIndex;
+            while (inputIndex > -1 && input[inputIndex] != ' ') {
+                result[resultIndex++] = input[inputIndex--];
+            }
+            reverseWord(result, startIndex, resultIndex - 1);
+            if (startIndex <= resultIndex - 1) {
+                result[resultIndex++] = ' ';
+            }
+        }
+        return new String(result, 0, resultIndex - 1);
+    }
+
+    // 1324. Print Words Vertically
+    public List<String> printVertically(String s) {
+        ArrayList<String> words = new ArrayList<>();
+        int wordStartIndex = 0;
+        int maxWordLen = 0;
+        while (wordStartIndex < s.length()) {
+            int workEndIndex = s.indexOf(' ', wordStartIndex);
+            if (workEndIndex == -1) {
+                workEndIndex = s.length();
+            }
+            words.add(s.substring(wordStartIndex, workEndIndex));
+            maxWordLen = Math.max(maxWordLen, workEndIndex - wordStartIndex);
+            wordStartIndex = workEndIndex + 1;
+        }
+
+        ArrayList<String> result = new ArrayList<>(maxWordLen);
+        for (int letterIndex = 0; letterIndex < maxWordLen; letterIndex++) {
+            StringBuilder modWord = new StringBuilder(words.size());
+            for (String word : words) {
+                char letter = letterIndex >= word.length() ? ' ' : word.charAt(letterIndex);
+                modWord.append(letter);
+            }
+            int endInd = modWord.length() - 1;
+            while (modWord.charAt(endInd) == ' ') {
+                endInd--;
+            }
+            result.add(modWord.substring(0, endInd + 1));
+        }
+
+        return result;
+    }
+
+    // 148. Sort List
+    public ListNode sortList(ListNode start, ListNode end, ListNode startNodeParent) {
+        if (start == end) {
+            return startNodeParent;
+        }
+        ListNode mid = start;
+        ListNode curNode = start;
+        ListNode midParent = null;
+        while (curNode != end && end.next != curNode) {
+            curNode = curNode.next;
+            if (curNode != null) {
+                curNode = curNode.next;
+            }
+            midParent = mid;
+            mid = mid.next;
+        }
+        ListNode list1 = sortList(start, midParent, startNodeParent);
+        ListNode list2 = sortList(mid, end, midParent);
+
+        // if (startNodeParent != null) {
+        // System.out.print(startNodeParent.val + " ");
+        // } else {
+        // System.out.print("Null" + " ");
+        // }
+        // System.out.println(start.val + " " + mid.val + " " + end.val);
+
+        while (start != midParent && mid != end) {
+        }
+
+        return startNodeParent == null ? start : startNodeParent;
+    }
+
+    // 148. Sort List
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode end = head;
+        while (end.next != null) {
+            end = end.next;
+        }
+        return sortList(head, end, null);
     }
 
     // 451. Helper
@@ -301,48 +473,6 @@ public class Solution {
             thresh += step;
         }
         return startNode;
-    }
-
-    // 148. Sort List helper
-    private void sortListHelper(ListNode startNode, ListNode endNode, ListNode startNodeParent, int listLength) {
-        if (startNode == endNode || endNode == null || endNode.next == startNode) {
-            return;
-        }
-
-        ListNode pivotNodeParent = startNodeParent;
-        ListNode pivotNode = startNode;
-        ListNode currentNode = startNode;
-
-        // Randomized pivot
-        swap(pickRandomNode(startNode, endNode, listLength), endNode);
-
-        int leftSubarrayLen = 0;
-        while (currentNode != endNode) {
-            if (currentNode.val < endNode.val) {
-                swap(currentNode, pivotNode);
-                pivotNodeParent = pivotNode;
-                pivotNode = pivotNode.next;
-                leftSubarrayLen++;
-            }
-            currentNode = currentNode.next;
-        }
-        swap(pivotNode, endNode);
-
-        // Find Node right before pivot Node
-        sortListHelper(startNode, pivotNodeParent, startNodeParent, leftSubarrayLen);
-        sortListHelper(pivotNode.next, endNode, pivotNode, listLength - leftSubarrayLen);
-    }
-
-    // 148. Sort List
-    public ListNode sortList(ListNode head) {
-        ListNode endNode = head;
-        int len = 0;
-        while (endNode != null && endNode.next != null) {
-            len++;
-            endNode = endNode.next;
-        }
-        sortListHelper(head, endNode, null, len);
-        return head;
     }
 
     // 328. Odd Even Linked List
