@@ -9,6 +9,227 @@ import java.util.*;
 
 public class Solution {
 
+    // 3446. Sort Matrix by Diagonals
+    public void sortMatrixHelper(int[][] grid,
+            int startX, int startY,
+            int endX, int endY,
+            Comparator<Integer> comparator) {
+
+        if (startX >= endX || startY >= endY || ((endX - startX) != (endY - startY)) || startX == endX - 1) {
+            return;
+        }
+        int midX = (startX + endX) / 2;
+        int midY = (startY + endY) / 2;
+        sortMatrixHelper(grid, startX, startY, midX, midY, comparator);
+        sortMatrixHelper(grid, midX, midY, endX, endY, comparator);
+
+        int[] sorted = new int[endX - startX];
+        int p1x = startX, p1y = startY;
+        int p2x = midX, p2y = midY;
+        int ps = 0;
+        while (p1x < midX || p2x < endX) {
+            if (p2x >= endX || (p1x < midX && comparator.compare(grid[p1x][p1y], grid[p2x][p2y]) <= 0)) {
+                sorted[ps] = grid[p1x][p1y];
+                p1x++;
+                p1y++;
+            } else {
+                sorted[ps] = grid[p2x][p2y];
+                p2x++;
+                p2y++;
+            }
+            ps++;
+        }
+
+        for (int x = startX, y = startY, sortInd = 0; x < endX && y < endY; x++, y++, sortInd++) {
+            grid[x][y] = sorted[sortInd];
+        }
+    }
+
+    // 3446. Sort Matrix by Diagonals
+    public int[][] sortMatrix(int[][] grid) {
+        int grid_size = grid.length;
+        for (int startX = 0; startX < grid_size; startX++) {
+            sortMatrixHelper(grid, startX, 0, grid_size, grid_size - startX, (p1, p2) -> (p2 - p1));
+        }
+        for (int startY = 1; startY < grid_size; startY++) {
+            sortMatrixHelper(grid, 0, startY, grid_size - startY, grid_size, (p1, p2) -> (p1 - p2));
+        }
+        return grid;
+    }
+
+    // 36. Valid Sudoku
+    public boolean isValidSudoku(char[][] board) {
+        for (int rowIndex = 0; rowIndex < board.length; rowIndex++) {
+            boolean[] visited = new boolean[10];
+            for (int colIndex = 0; colIndex < board[0].length; colIndex++) {
+                if (board[rowIndex][colIndex] == '.') {
+                    continue;
+                }
+                if (visited[board[rowIndex][colIndex] - '0']) {
+                    return false;
+                }
+                visited[board[rowIndex][colIndex] - '0'] = true;
+            }
+        }
+        for (int colIndex = 0; colIndex < board[0].length; colIndex++) {
+            boolean[] visited = new boolean[10];
+            for (int rowIndex = 0; rowIndex < board.length; rowIndex++) {
+                if (board[rowIndex][colIndex] == '.') {
+                    continue;
+                }
+                if (visited[board[rowIndex][colIndex] - '0']) {
+                    return false;
+                }
+                visited[board[rowIndex][colIndex] - '0'] = true;
+            }
+        }
+        for (int startX = 0; startX < board.length; startX += 3) {
+            for (int startY = 0; startY < board[0].length; startY += 3) {
+                boolean[] visited = new boolean[10];
+                for (int rowIndex = startX; rowIndex < startX + 3; rowIndex++) {
+                    for (int colIndex = startY; colIndex < startY + 3; colIndex++) {
+                        if (board[rowIndex][colIndex] == '.') {
+                            continue;
+                        }
+                        if (visited[board[rowIndex][colIndex] - '0']) {
+                            return false;
+                        }
+                        visited[board[rowIndex][colIndex] - '0'] = true;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    // 3000. Maximum Area of Longest Diagonal Rectangle
+    public int areaOfMaxDiagonal(int[][] dimensions) {
+        int max_area = 0, max_diag = 0;
+        for (int[] dimension : dimensions) {
+            int cur_diag = dimension[0] * dimension[0] + dimension[1] * dimension[1];
+            int cur_area = dimension[0] * dimension[1];
+            if (cur_diag > max_diag || (cur_diag == max_diag && cur_area > max_area)) {
+                max_area = cur_area;
+                max_diag = cur_diag;
+            }
+        }
+        return max_area;
+    }
+
+    // 1657. Determine if Two Strings Are Close
+    public boolean closeStrings(String word1, String word2) {
+        if (word1.length() != word2.length()) {
+            return false;
+        }
+        int[] map1 = new int[26];
+        int[] map2 = new int[26];
+
+        for (int index = 0; index < word1.length(); index++) {
+            map1[word1.charAt(index) - 'a']++;
+        }
+        for (int index = 0; index < word2.length(); index++) {
+            map2[word2.charAt(index) - 'a']++;
+        }
+
+        for (int map1Index = 0; map1Index < 26; map1Index++) {
+            if (map1[map1Index] == 0) {
+                continue;
+            }
+            for (int map2Index = map1Index + 1; map2Index < 26; map2Index++) {
+                if (map1[map1Index] == map2[map2Index] && map2[map1Index] != 0) {
+                    int temp = map2[map2Index];
+                    map2[map2Index] = map2[map1Index];
+                    map2[map1Index] = temp;
+                    break;
+                }
+            }
+        }
+
+        for (int index = 0; index < 26; index++) {
+            if (map1[index] != map2[index]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // 2438. Range Product Queries of Powers
+    public int[] productQueries(int n, int[][] queries) {
+        int[] result = new int[queries.length];
+        String binary = Integer.toBinaryString(n);
+        int[] powers = new int[binary.length() + 1];
+        int powersSize = 1;
+
+        for (int index = binary.length() - 1; index > -1; index--) {
+            if (binary.charAt(index) == '0') {
+                continue;
+            }
+            powers[powersSize++] = binary.length() - 1 - index;
+        }
+
+        for (int index = 1; index < powersSize; index++) {
+            powers[index] += powers[index - 1];
+        }
+
+        int modulo = (int) Math.pow(10, 9) + 7;
+        for (int index = 0; index < queries.length; index++) {
+            int[] query = queries[index];
+            result[index] = (int) (Math.pow(2, powers[query[1] + 1] - powers[query[0]]) % modulo);
+        }
+
+        return result;
+    }
+
+    // 2264. Largest 3-Same-Digit Number in String
+    public String largestGoodInteger(char[] arr) {
+        int[] count = new int[60];
+        int max = '/';
+
+        for (int index = 0; index < 3; index++) {
+            count[arr[index]] += 1;
+        }
+        if (count[arr[2]] == 3) {
+            max = Math.max(arr[2], max);
+        }
+
+        for (int index = 3; index < arr.length; index++) {
+            count[arr[index]] += 1;
+            count[arr[index - 3]] -= 1;
+            if (count[arr[index]] == 3) {
+                max = Math.max(max, arr[index]);
+                if (max == '9') {
+                    break;
+                }
+            }
+        }
+
+        return max == '/' ? "" : String.valueOf((char) max).repeat(3);
+    }
+
+    // 2348. Number of Zero-Filled Subarrays
+    public long zeroFilledSubarray(int[] nums) {
+        long result = 0;
+        int index = 0;
+
+        while (index < nums.length) {
+            while (index < nums.length && nums[index] != 0) {
+                index++;
+            }
+            if (index >= nums.length) {
+                break;
+            }
+            int count0 = 0;
+            while (index < nums.length && nums[index] == 0) {
+                count0++;
+                index++;
+            }
+            result += (count0 * (count0 + 1)) / 2;
+        }
+
+        return result;
+    }
+
     // 1493. Longest Subarray of 1's After Deleting One Element
     public int longestSubarray(int[] nums) {
         int result = 0;
@@ -1520,7 +1741,7 @@ public class Solution {
         HashMap<String, List<String>> map = new HashMap<>();
 
         for (String str : strs) {
-            String key = groupAnagrams(str);
+            String key = groupAnagramsHelper(str);
             List<String> val = map.getOrDefault(key, new ArrayList<>());
             val.add(str);
             map.put(key, val);
@@ -1529,16 +1750,12 @@ public class Solution {
         return new ArrayList<>(map.values());
     }
 
-    public String groupAnagrams(String str) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("00000000000000000000000000");
-
+    public String groupAnagramsHelper(String str) {
+        char[] arr = new char[26];
         for (char ch : str.toCharArray()) {
-            int index = ch - 'a';
-            builder.setCharAt(index, (char) (builder.charAt(index) + 1));
+            arr[ch - 'a']++;
         }
-
-        return builder.toString();
+        return new String(arr);
     }
 
     // 187. Repeated DNA Sequences
