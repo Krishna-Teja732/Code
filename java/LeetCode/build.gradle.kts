@@ -22,3 +22,8 @@ application {
     mainClass = "Leet.Main"
 }
 
+tasks.jar {
+    manifest {
+        attributes("Main-Class" to "Leet.Main")
+    }
+}
