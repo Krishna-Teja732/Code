@@ -10,6 +10,125 @@ import java.util.*;
 
 public class Solution {
 
+	// 110. Balanced Binary Tree Helper
+	public Pair<Boolean, Integer> isBalanced(TreeNode root, int level) {
+		if (root == null) {
+			return new Pair<>(true, level);
+		}
+
+		var left = isBalanced(root.left, level + 1);
+		var right = isBalanced(root.right, level + 1);
+
+		return new Pair<>(Math.abs(left.val2 - right.val2) < 2 && left.val1 && right.val1,
+				Math.max(left.val2, right.val2) + 1);
+	}
+
+	// 110. Balanced Binary Tree
+	public boolean isBalanced(TreeNode root) {
+		var res = isBalanced(root, 0);
+		return res.val1;
+	}
+
+	// 240. Search a 2D Matrix II helper
+	public int colSearch(int[][] matrix, int target, int col, int rowStart, int rowEnd) {
+		int mid = rowStart;
+		while (rowStart <= rowEnd) {
+			mid = (rowStart + rowEnd) / 2;
+			if (matrix[mid][col] == target) {
+				return mid;
+			} else if (matrix[mid][col] < target) {
+				rowStart = mid + 1;
+			} else {
+				rowEnd = mid - 1;
+			}
+		}
+
+		return matrix[mid][col] < target ? mid + 1 : mid;
+	}
+
+	// 240. Search a 2D Matrix II helper
+	public int rowSearch(int[][] matrix, int target, int row, int colStart, int colEnd) {
+		int mid = colStart;
+		while (colStart <= colEnd) {
+			mid = (colStart + colEnd) / 2;
+			if (matrix[row][mid] == target) {
+				return mid;
+			} else if (matrix[row][mid] < target) {
+				colStart = mid + 1;
+			} else {
+				colEnd = mid - 1;
+			}
+		}
+
+		return matrix[row][mid] > target ? mid - 1 : mid;
+	}
+
+	// 240. Search a 2D Matrix II
+	public boolean searchMatrixII(int[][] matrix, int target) {
+		int rowStart = 0, rowEnd = matrix.length - 1, curRow = 0;
+		int colStart = 0, colEnd = matrix[rowStart].length - 1, curCol = 0;
+
+		while (rowStart <= rowEnd && colStart <= colEnd) {
+			curCol = rowSearch(matrix, target, curRow, colStart, colEnd);
+			colEnd = curCol;
+			if (curCol < 0 || curCol > matrix[0].length - 1) {
+				return false;
+			}
+			if (matrix[curRow][curCol] == target) {
+				return true;
+			}
+
+			curRow = colSearch(matrix, target, curCol, rowStart, rowEnd);
+			rowStart = curRow;
+			if (curRow < 0 || curRow > matrix.length - 1) {
+				return false;
+			}
+			if (matrix[curRow][curCol] == target) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// 34. Find first and last position of Element in sorted array
+	public int[] searchRange(int[] nums, int target) {
+		if (nums.length == 0) {
+			return new int[] { -1, -1 };
+		}
+
+		int minInd = -1, maxInd = -1;
+		int start = 0, end = nums.length - 1;
+		int mid = 0;
+		while (start <= end) {
+			mid = (start + end) / 2;
+			if (nums[mid] >= target) {
+				end = mid - 1;
+			} else {
+				start = mid + 1;
+			}
+		}
+		minInd = nums[mid] < target ? mid + 1 : mid;
+
+		start = 0;
+		end = nums.length - 1;
+		while (start <= end) {
+			mid = (start + end) / 2;
+			if (nums[mid] > target) {
+				end = mid - 1;
+			} else {
+				start = mid + 1;
+			}
+		}
+		maxInd = nums[mid] > target ? mid - 1 : mid;
+
+		if (minInd > maxInd) {
+			return new int[] { -1, -1 };
+		}
+
+		return new int[] { minInd, maxInd };
+	}
+
 	// 37. Sudoku Solver helper
 	public boolean solveSudoku(int row,
 			int col,
@@ -1550,49 +1669,6 @@ public class Solution {
 		}
 
 		return nums[start] < target ? start + 1 : start;
-	}
-
-	// 34. Find First and Last Position of Element in Sorted Array
-	public int[] searchRange(int[] nums, int target) {
-		if (nums.length == 0) {
-			return new int[] { -1, -1 };
-		}
-		int minInd = nums[0] == target ? 0 : -1;
-		int maxInd = nums[nums.length - 1] == target ? nums.length - 1 : -1;
-
-		int start = 0, end = nums.length - 1;
-		while (start <= end && minInd != 0) {
-			int mid = (start + end) / 2;
-
-			if (nums[mid] == target && nums[mid - 1] < target) {
-				minInd = mid;
-				break;
-			}
-
-			if (nums[mid] >= target) {
-				end = mid - 1;
-			} else {
-				start = mid + 1;
-			}
-		}
-
-		start = 0;
-		end = nums.length - 1;
-		while (start <= end && maxInd != nums.length - 1) {
-			int mid = (start + end) / 2;
-
-			if (nums[mid] == target && nums[mid + 1] > target) {
-				maxInd = mid;
-				break;
-			}
-
-			if (nums[mid] <= target) {
-				start = mid + 1;
-			} else {
-				end = mid - 1;
-			}
-		}
-		return new int[] { minInd, maxInd };
 	}
 
 	// 328. Odd Even Linked List
